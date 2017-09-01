@@ -8,6 +8,9 @@ ALTER TABLE base_bati.bati_rcu_rfu_2016_mfa_update_2_rfu_inte
   ALTER COLUMN geom TYPE geometry(polygon, 2154) 
     USING ST_Force2D(geom);
 
+-- Passer de 3D à 2D en passant de multi point à point
+SELECT ST_Force2D((ST_Dump(wkb_geometry)).geom) as wkb_geometry
+FROM tr20.nro;
 --- reprojection
 
 ALTER TABLE covage.sirene_geo 
@@ -18,6 +21,10 @@ USING ST_Transform(geom, 2154);
 -- mettre à jour la projection
 
 select UpdateGeometrySRID('crcd_livrable', 'nps', 'the_geom', 2154) ;
+
+-- mettre à jour type de geometrie
+
+SELECT populate_geometry_columns('travail.cable'::regclass);
 
 --- corriger la géométrie avec un buffer nul
 (SELECT id, type, ST_Multi(ST_Buffer(geom,0))::geometry(MULTIPOLYGON, 2154) FROM travail.invalidgeometry 
@@ -130,6 +137,13 @@ DROP COLUMN geom;
 select ST_GeometryType(geometry)
 from table 
 
+
+--- Précise le type de géométrie de la colonne geom
+ALTER TABLE travail.zde
+ADD CONSTRAINT enforce_geotype_geom
+CHECK (geometrytype(geom) = 'MultiPolygon')
+
+
 ------- Clustering within a threshold distance with ST_ClusterWithin
 
 
@@ -201,6 +215,19 @@ SELECT
        phase, start_date::int, end_date::int, St_linemerge(ST_Union(geom))  as geom
          FROM energy.pf003_coolingnetwork_kaitak_2016
          GROUP BY phase,  start_date, end_date;
+
+--- Vérifie la correspondance entre le nombre de fourreaux de la couche fourreaux et le champ "TRCH_NB_F" de la couche tranchee
+SELECT f.geom as lgfourreaux_geom, t.geom as tranchee_geom, 
+count_fourreaux, 
+TRCH_NB_F  = count_fourreaux  AS sont_egaux
+FROM 
+    (SELECT geom, count(0) count_fourreaux 
+    FROM travail.lgfourreaux
+    GROUP BY geom
+    ) as f
+JOIN
+    travail.tranchee t
+ON t.geom = f.geom
 
 
 ------ ajouter une colomne
@@ -289,6 +316,11 @@ EXCEPT
 
 SELECT category FROM legacy_products;
 
+--- selectionner le pourcentage d'aéroport en atitude par état
+SELECT 
+state, 
+100.0 * sum(CASE WHEN elevation >= 2000 THEN 1 ELSE 0 END) / count(*)  as percentage_high_elevation_airports 
+FROM airports GROUP BY state;
 ---- Prend les deux dernières valeurs du champ
 
 SELECT RIGHT(code_cb, 2), code_cb
