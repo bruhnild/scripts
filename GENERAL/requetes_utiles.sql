@@ -197,9 +197,11 @@ WHERE
       ST_Intersects(h.the_geom,p.the_geom)
   ) AS foo
 
---- ajouter index geom
+--- Indexation spatiale
 
-CREATE INDEX index on table USING GIST (geom) ;
+CREATE INDEX table_name_gix ON table_name USING GIST (geom);
+VACUUM ANALYZE table_name
+CLUSTER table_name USING table_name_gix;
 
 --- ajouter index attributaire
 
@@ -396,6 +398,16 @@ FROM     chaud.sous_station_potentielle_all
 GROUP BY identifiant_all
 HAVING   COUNT(*) > 1
 
+---Find duplicate rows in a table based on values from two fields:
+
+ select * from (
+   SELECT id,
+   ROW_NUMBER() OVER(PARTITION BY merchant_Id, url ORDER BY id asc) AS Row
+   FROM Photos
+ ) dups
+ where
+ dups.Row > 1
+
 ---------------------------------- commenter une table/champs
 
 COMMENT ON TABLE chaud.net_deliverypoint IS 'Point de livraison';
@@ -435,8 +447,48 @@ SELECT LENGTH('exemple');
 
 CREATE DATABASE music ENCODING 'UTF8' TEMPLATE template0;
 
+---import data from a CSV file using the COPY command:
+
+ COPY noise.locations (name, complaint, descript, boro, lat, lon)
+ FROM '/Users/chrislhenrick/tutorials/postgresql/data/noise.csv' WITH CSV HEADER;
+
+ --import CSV file into table, only specific columns
+
+\copy <table_name>(<column_1>,<column_1>,<column_1>) FROM '<file_path>' CSV
+
+
+---create a new table for data from a CSV that has lat and lon columns:
+
+create table noise.locations
+(                                     
+name varchar(100),
+complaint varchar(100), descript varchar(100),
+boro varchar(50),
+lat float8,
+lon float8,
+geom geometry(POINT, 4326)
+);
+
+---inputing values for the geometry type after loading data from a CSV:
+update noise.locations set the_geom = ST_SetSRID(ST_MakePoint(lon, lat), 4326);
+
 --- Export en CSV
 
 SET CLIENT_ENCODING TO 'utf8';
 COPY ep.diag_nro
 TO 'C:\csv\myfile1.csv' WITH DELIMITER  ';' CSV HEADER ;
+
+--export table, only specific columns, to CSV file
+
+\copy <table_name>(<column_1>,<column_1>,<column_1>) TO '<file_path>' CSV
+
+
+--Select data within a bounding box
+--Using ST_MakeEnvelope
+
+--HINT: You can use bboxfinder.com to easily grab coordinates of a bounding box for a given area.
+
+select ST_Extent(geom) from orange.arciti;
+
+SELECT * FROM some_table
+where geom && ST_MakeEnvelope(-73.913891, 40.873781, -73.907229, 40.878251, 4326)

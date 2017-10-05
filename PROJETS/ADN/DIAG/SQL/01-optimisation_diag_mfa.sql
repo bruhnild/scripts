@@ -178,6 +178,7 @@ ref_chambr_valid is null
 
 */
 
+
 --- Controle topologique : on ne traite que les chambres raccrochées aux cables
 
 
@@ -210,7 +211,8 @@ SELECT
  id,
  code_ch1,
  cle_mkt2,
- ref_chambr
+ ref_chambr,
+ implant
 FROM chantier.ft_chambre AS ch
 WHERE ch.id NOT IN
   (
@@ -248,7 +250,7 @@ SELECT
  r2.geom AS geomroom
 FROM chantier.ft_chambre_clean r JOIN chantier.ft_arciti c ON st_dwithin(st_boundary(c.geom), r.geom, 0.001) --- lien entre la chambre de départ et un câble
 JOIN chantier.ft_chambre_clean r2 ON st_dwithin(st_boundary(c.geom), r2.geom, 0.001) --- lien entre un cable et sa chambre d'arrivée
-WHERE r.id = 16 AND r2.id <> 16  --- id chambre de départ
+WHERE r.id = 97 AND r2.id <> 97  --- id chambre de départ
 
 /*
 -------------------------------------------------------------------------------------
@@ -417,6 +419,7 @@ CREATE TABLE chantier.analyse_chambre_reformat_order_rows_a AS
 SELECT 
  chambre_a, 
  ref_chambr AS type_chb_a, 
+ implant as implant_a,
  serial
 FROM chantier.analyse_chambre_reformat_order_rows AS a
 LEFT JOIN chantier.ft_chambre_clean AS b ON a.chambre_a=b.code_ch1;
@@ -428,6 +431,7 @@ CREATE TABLE chantier.analyse_chambre_reformat_order_rows_b AS
 SELECT 
  chambre_b, 
  ref_chambr as type_chb_b, 
+ implant as implant_b,
  id_cable, 
  null::varchar as composition, 
  null::varchar as type_reseau, 
@@ -443,12 +447,21 @@ CREATE TABLE chantier.diag_nro AS
 SELECT 
  chambre_a, 
  type_chb_a, 
+ implant_a,
  chambre_b, 
  type_chb_b, 
+ implant_b,
  id_cable, 
  composition, 
  type_reseau,
- longueur
+ longueur::int,
+ 'Orange'::varchar as proprietaire,
+ 'Non'::varchar as percement_a,
+ 'Non'::varchar as percement_b,
+ '-'::varchar as  diam_alveole,
+ '-'::varchar as  occup_alv,
+ '-'::varchar as  perc_occup
+
 FROM chantier.analyse_chambre_reformat_order_rows_a AS a
 LEFT JOIN chantier.analyse_chambre_reformat_order_rows_b AS b ON a.serial=b.serial
 ORDER BY a.serial;
@@ -472,6 +485,23 @@ FROM chantier.ft_arciti AS b
 WHERE a.id_cable=b.id
 ;
 
+--- Update Percement CHB A
+
+UPDATE chantier.diag_nro AS a 
+SET percement_a = 'Oui'
+WHERE classement = 1
+;
+
+--- Classer le diag par ordre de chambre
+
+UPDATE chantier.diag_nro SET classement = sort
+FROM (select classement, rank() over (ORDER BY classement) sort
+FROM chantier.diag_nro) o
+WHERE chantier.diag_nro.classement = o.classement
+
+
+;
+
 --- Supprimer doublons 
 
 DELETE FROM chantier.diag_nro
@@ -487,7 +517,7 @@ WHERE classement IN (
 
 --- Export en CSV
 
-SET CLIENT_ENCODING TO 'utf8';
+SET CLIENT_ENCODING TO 'LATIN1';
 COPY chantier.diag_nro
 TO 'C:\csv\myfile1.csv' WITH DELIMITER  ';' CSV HEADER ;
 
@@ -501,7 +531,7 @@ SELECT
  distinct on(id) id as ogc_fid, 
  classement,
  statut, 
- implant, 
+ implant,
  nature_cha, 
  ref_chambr, 
  ref_note, 
@@ -523,7 +553,7 @@ FROM chantier.ft_chambre as a, chantier.diag_nro AS b
 WHERE a.code_ch1=b.chambre_a OR a.code_ch1=b.chambre_b
 ;
 
-
+ALTER TABLE chantier.chb ADD PRIMARY KEY (ogc_fid);
 CREATE INDEX idx_chb_id ON chantier.chb (classement) ; --- index attributaire
 CREATE INDEX idx_chb_geom ON chantier.chb (wkb_geometry) ; --- index spatial
 
@@ -552,6 +582,7 @@ FROM chantier.ft_arciti AS a, chantier.diag_nro AS b
 WHERE a.id = b.id_cable
 ;
 
+ALTER TABLE chantier.infra ADD PRIMARY KEY (ogc_fid);
 
 
 --- Sppression tables intermédiaires
@@ -564,3 +595,5 @@ DROP TABLE IF EXISTS chantier.analyse_chambre_reformat_order;
 DROP TABLE IF EXISTS chantier.analyse_chambre_reformat_order_rows;
 DROP TABLE IF EXISTS chantier.analyse_chambre_reformat_order_rows_a;
 DROP TABLE IF EXISTS chantier.analyse_chambre_reformat_order_rows_b;
+
+
