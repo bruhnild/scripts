@@ -280,6 +280,12 @@ ALTER TABLE building_2d.bati_rouen_metropole_ign2015_2154
 
 ALTER TABLE building_2d.bati_rouen_metropole_ign2015_2154 ADD COLUMN gid SERIAL PRIMARY KEY;
 
+--Ajouter clé primaire
+
+ALTER TABLE tr20_out.lgfourreaux
+  ADD PRIMARY KEY (lgfx_id);
+
+
 
 ----- Remplacer ',' par '-'
 

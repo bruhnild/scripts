@@ -17,7 +17,8 @@ create table chantier.ft_arciti as
 SELECT ogc_fid as id, statut, mode_pose, aut_passag, aut_pass_1, nature_con, 
        type_longu, longueur, note, compositio, id_proprie, shape_len, 
        source_fil, wkb_geometry as geom 
-  FROM orange_ms7.ft_arciti_villeuneuve_de_berg;
+  FROM orange_ms7.ft_arciti_villeuneuve_de_berg
+  WHERE mode_pose = '7';
 
 drop table if exists chantier.ft_chambre ; 
 create table chantier.ft_chambre as 
