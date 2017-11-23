@@ -1,0 +1,10 @@
+id;id_opp;nom;com_dep;emprise;travaux;prev_starr;cables;typ_cable;prog_dsp;debut_trvx;moa;nb_suf;longueur;nb_chb_exists;nb_chb_a_creer;nb_chb_desserte;nb_chb_transport;nb_chb_indef
+1;OPP_1-8_LT_26301_WDHB_001;CD26_voirie_Saint-Donat-sur-l'Herbasse_Chavannes;SAINT-DONAT-SUR-L HERBASSE;Calibrage RD67-Saint-Donat-sur-L'herbasse-Chavannes;Refection de voirie;GC a creer;1x144FO + 1x2FO;1 Cable > 144;2018;Inconnue;Conseil départemental de la Drôme;3;547;;2;0;0;3
+2;OPP_3-27_LT_07156_MYR1_001;COO_2018_Meyras_Enfouissement réseaux secs_Meyras;MEYRAS;Hameau de Champagne;Refection de voirie;;;;;Printemps 2018;Commune de Meyras;38;263;;;;;
+3;OPP_3-XX_LT_07291_WRMZ_001;COO_Bidon_St-Remeze_RAB_HTA;SAINT-REMEZE;Saint-Remeze-Bidon;Enfouissement HTA;GC a creer;1x432FO;1 Cable > 432;;Inconnue;Enedis;459;13134;;2;2;0;0
+4;OPP_3-XX_LT_07291_WRMZ_001;COO_Bidon_St-Remeze_RAB_HTA;SAINT-REMEZE;Saint-Remeze-Bidon;Enfouissement HTA;GC a creer;1x432FO;1 Cable > 432;;Inconnue;Enedis;459;13134;;2;0;2;0
+5;OPP_3-XX_LT_07339_VSSX_001;Mise en séparatif du réseau d'assainissement;SAINT-PRIVAT;Montée du Vignal;Assainissement;;1;; ;Inconnue;Syndicat des Eaux du Bassin de l'Ardèche;12;274;;;;;
+6;OPP_4-19_LT_07090_FLVC_001;CD07_aménagement-RD;COUX;D2 - Petit Tournon jusqu'au moulin à vent;Refection de voirie;;1x288FO;1 Cable > 144;2018;Automne 2017;Conseil départemental de l'Ardèche;92;1408;;;;;
+7;OPP_4-XX_LT_26165_LVON_001;Construction d'ouvrage de ligne-Creation de lignes HTA souterraines+BT et encorbellement au dessus de la voie ferrée;LIVRON-SUR-DROME;Route de La Voulte- ZAC Confluence;Enfouissement BT;;1x288FO + 2x2FO;;;Inconnue;Enedis;275;5886;1;;;;
+8;OPP_4-XX_LT_26381_JLAN_001;Creation ligne HTA et remplacement cable;JAILLANS;Jaillans;Enfouissement HTA;Conduite FT;3  X720 + 1 X432;X Cables >720;;Inconnue;Enedis;217;9980;;7;0;8;0
+9;OPP_4-XX_LT_26381_JLAN_001;Creation ligne HTA et remplacement cable;JAILLANS;Jaillans;Enfouissement HTA;Conduite FT;3  X720 + 1 X432;X Cables >720;;Inconnue;Enedis;217;11697;;5;5;0;0

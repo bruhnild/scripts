@@ -68,6 +68,18 @@ FROM
 WHERE ST_GeometryType(g.geom) = 'ST_MultiPolygon' 
    OR ST_GeometryType(g.geom) = 'ST_Polygon';
 
+   SELECT 
+  g.geom, 
+  g.cb_id,
+  row_number() over() AS gid,
+FROM 
+  (SELECT 
+     (ST_DUMP(ST_MakeValid (geom))).geom  FROM your_table
+  ) AS g
+WHERE ST_GeometryType(g.geom) = 'ST_MultiLinestring' 
+   OR ST_GeometryType(g.geom) = 'ST_Linestring';
+
+
 
 You can try ST_CollectionExtract to extract [Multi]Polygons from GeometryCollections. Use ST_Multi to force them as MuliPolygon:
 
@@ -218,6 +230,16 @@ SELECT
          FROM energy.pf003_coolingnetwork_kaitak_2016
          GROUP BY phase,  start_date, end_date;
 
+
+--- Fusion de polygones sur un champ
+
+SELECT
+    (ST_Dump(St_multi(ST_Union(geom)))).geom AS geom, range_id
+FROM 
+    analyse.heat_map 
+    group by range_id
+;
+
 --- Vérifie la correspondance entre le nombre de fourreaux de la couche fourreaux et le champ "TRCH_NB_F" de la couche tranchee
 SELECT f.geom as lgfourreaux_geom, t.geom as tranchee_geom, 
 count_fourreaux, 
@@ -329,6 +351,14 @@ SELECT
 state, 
 100.0 * sum(CASE WHEN elevation >= 2000 THEN 1 ELSE 0 END) / count(*)  as percentage_high_elevation_airports 
 FROM airports GROUP BY state;
+
+
+--- Couper des lignes par des points 
+
+select couche_de_ligne.champ1,couche_de_ligne.champ2,
+ST_SNAP((ST_DUMP(st_difference(couche_de_ligne.the_geom,point))).geom,all_point,0.1) as the_geom 
+from (select ST_Multi(ST_Union(st_expand(couche_de_point.the_geom, 0.05))) as point from couche_de_point ) as t1, 
+couche_de_ligne,(select ST_MULTI(ST_COLLECT(couche_de_point.the_geom))as all_point from couche_de_point) as t2
 ---- Prend les deux dernières valeurs du champ
 
 SELECT RIGHT(code_cb, 2), code_cb
@@ -427,6 +457,24 @@ FROM chaud.pf004_heated_batiment_ign_dalkia_mfa_2016_2154 as poly, chaud.pf004_n
 WHERE points.identifiant='{B186C22D-04AC-4AC8-B714-AC4BAB910774}' AND ST_DWithin(poly.geom, points.geom, 1000) 
 ORDER BY ST_Distance(poly.geom, points.geom) LIMIT 1;
 
+--- connaitre les doublons (gid) à supprimer
+
+select gid from
+(SELECT *, row_number() OVER (PARTITION BY id_geom) as row
+FROM(
+    SELECT DISTINCT *, LEAST(st_astext(the_geom), st_astext(st_reverse(the_geom))) || '_' || greatest(st_astext(the_geom), st_astext(st_reverse(the_geom))) AS id_geom
+    FROM  temp.line as T1
+    WHERE  EXISTS (SELECT *
+        FROM   temp.line T2
+        WHERE  T1.gid <> T2.gid
+        AND T1.the_geom && T2.the_geom
+        AND  (st_astext(T1.the_geom) = st_astext(T2.the_geom) OR st_astext(T1.the_geom) = st_astext(st_reverse(T2.the_geom)))
+        )
+    ORDER BY id_geom
+    ) as S1
+) as S2
+where row > 1
+
 --- Supprimer doublons 
 
 DELETE FROM ep.diag_nro
@@ -452,6 +500,11 @@ SELECT LENGTH('exemple');
 ---- Creer BDD en UTF8
 
 CREATE DATABASE music ENCODING 'UTF8' TEMPLATE template0;
+
+-- ou 
+
+update pg_database set encoding = pg_char_to_encoding('UTF8') where datname = 'l49'
+
 
 ---import data from a CSV file using the COPY command:
 
@@ -498,3 +551,8 @@ select ST_Extent(geom) from orange.arciti;
 
 SELECT * FROM some_table
 where geom && ST_MakeEnvelope(-73.913891, 40.873781, -73.907229, 40.878251, 4326)
+
+--- Mettre tous les résultats dans une ligne
+SELECT   array_agg(un_id_opp.id_opp)
+ AS id_opp
+FROM     un_id_opp
