@@ -87,17 +87,26 @@ CREATE OR REPLACE VIEW administratif.vue_adn_suf_majic_2016 AS SELECT
 --- Schema : coordination
 --- Table : chambres
 
-CREATE OR REPLACE VIEW coordination.vue_chambres AS 
+CREATE OR REPLACE VIEW coordination.vue_chambres_a_creer AS 
 SELECT 
  a.id, 
  a.geom, 
- id_opp,
+ id_coord,
  comment,
  fonction
- FROM coordination.chambres as a
+ FROM coordination.chambres_a_creer as a
  JOIN  administratif.communes as b
  ON ST_CONTAINS (b.geom , a.geom)
  WHERE b.opp is not null;
+
+
+--- Schema : coordination
+--- Table : chambres_existantes
+
+CREATE OR REPLACE VIEW coordination.vue_chambres_existantes AS
+select *
+from coordination.chambres_existantes
+where id_coord is not null
 
 
 -- Schema : coordination
@@ -1017,26 +1026,3 @@ GROUP BY id_nro
 ) doublons_nro
 order by nbr_doublon DESC
 
-
-SELECT 
-  (WITH prev_starr AS (
-  SELECT prev_starr FROM 
-    (WITH max AS 
-      (SELECT id_opp, max(longueur) AS longueur FROM  coordination.opportunite GROUP BY id_opp)
-    SELECT DISTINCT ON (max.id_opp) max.id_opp, prev_starr,  max.longueur
-    FROM coordination.opportunite o,max
-    WHERE o.longueur = max.longueur
-    ORDER BY id_opp)first_with)
-  SELECT prev_starr AS prev_starr
-  FROM prev_starr) as prev_starr,
-  
-
-  (WITH longueur AS (
-  SELECT longueur_max FROM 
-    (WITH sum AS 
-      (SELECT id_opp, sum(longueur) as longueur_max FROM coordination.opportunite group by id_opp)
-    SELECT distinct on (sum.id_opp) sum.id_opp, sum.longueur_max
-  FROM coordination.opportunite o, sum)first_with)
-   SELECT longueur_max as longueur
-   FROM longueur) longueur
-   FROM coordination.opportunite

@@ -51,6 +51,13 @@ SET geom=cleangeometry(geom);
 
 ALTER TABLE public.mytable  ALTER COLUMN geom SET DATA TYPE geometry;
 
+-- préciser type geom 
+ALTER TABLE test.tampon_01 ALTER COLUMN geom type geometry(Polygon, 2154);
+
+-- précisez type geom si multi et polygon
+
+ALTER TABLE test.tampon_01 ALTER COLUMN geom type geometry(MultiPolygon, 2154) using ST_Multi(geom);
+
 UPDATE public.valid_mytable
 SET geom=ST_MakeValid(geom);
 
@@ -141,8 +148,10 @@ ALTER COLUMN geom TYPE geometry(linestring,2154) USING ST_GeometryN(geom, 1);
 SELECT AddGeometryColumn ('heat_map','h2020','centroide',4326,'POINT',2);
 UPDATE heat_map.h2020 SET centroide = ST_Centroid(geom);
 
-ALTER TABLE heat_map.h2020
-DROP COLUMN geom;
+--- ajouter geometrie centroide/point STRICTEMENT à l'interieur de la parcelle
+
+SELECT AddGeometryColumn ('cadastre','parcelles','centroide',2154,'POINT',2);
+UPDATE cadastre.parcelles SET centroide = ST_PointOnSurface(geom);
 
 -------- connaitre le type de geometrie des objects
 
@@ -209,6 +218,42 @@ WHERE
       ST_Intersects(h.the_geom,p.the_geom)
   ) AS foo
 
+-- Difference entre tampon tout pit et tampon 0/1/7 unis
+DROP TABLE IF EXISTS test.buffer_difference_01;
+CREATE TABLE test.buffer_difference_01 AS
+with temp as 
+(
+  select   b.gid, st_union(a.geom) as geom
+  from     test.tampon_extract_union_01_all b join test.tampon_extract_union_01 a on st_intersects(a.geom, b.geom)
+  group by b.gid
+) 
+select st_difference(b.geom,coalesce(t.geom, 'GEOMETRYCOLLECTION EMPTY'::geometry)) as geom
+from test.tampon_extract_union_01_all b left join temp t on b.gid = t.gid;
+
+
+--- Découper les lignes en ne gardant que celles à l'intérieur des polygones
+
+drop table if exists test.test ;
+create table test.test as 
+SELECT
+    geom(st_dump(st_intersection(tligne.geom,tpolygone.geom))) AS geom,
+    'L'||tligne.gid AS idligne,
+    'P'||tpolygone.gid AS idpolygone, 
+    tligne.id,
+    tligne.type,
+    tligne.emprise
+    
+FROM
+    test.tampon_iti as tpolygone,
+    test.emprise as tligne
+WHERE
+    tpolygone.geom && tligne.geom
+AND
+    st_intersects(tpolygone.geom,tligne.geom)
+ORDER BY
+    tligne.gid,
+    tpolygone.gid
+;
 --- Indexation spatiale
 
 CREATE INDEX table_name_gix ON table_name USING GIST (geom);
@@ -253,6 +298,10 @@ JOIN
     travail.tranchee t
 ON t.geom = f.geom
 
+
+-- Index geometrique
+CREATE INDEX buffer_difference_01_gix ON test.buffer_difference_01 USING GIST (geom);
+ALTER TABLE test.buffer_difference_01 ADD COLUMN gid SERIAL PRIMARY KEY;
 
 ------ ajouter une colomne
 

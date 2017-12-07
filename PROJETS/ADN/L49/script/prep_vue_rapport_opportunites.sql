@@ -41,7 +41,7 @@ WHERE a.id_opp NOT IN
    a.id_opp
    FROM coordination.opportunite a
    LEFT JOIN rip1.vue_chambres_adn b ON a.id_opp::text = b.id_opp::text
-   JOIN coordination.chambres c ON st_dwithin(a.geom, c.geom, 30::double precision)
+   JOIN coordination.chambres_a_creer c ON st_dwithin(a.geom, c.geom, 30::double precision)
    LEFT JOIN administratif.vue_nb_suf_opp d ON a.id_opp::text = d.id_opp::text
    WHERE a.id_opp IS NOT NULL
    GROUP BY a.id_opp,a.com_dep,a.emprise, a.travaux, a.prev_starr, a.cables, a.typ_cable, a.prog_dsp, a.debut_trvx, a.moa, d.nb_suf, b.nb_chb_exists
@@ -69,7 +69,7 @@ count(CASE WHEN fonction = 'Transport' THEN 1 ELSE NULL END) nb_chb_transport,
 count(CASE WHEN fonction = 'Indefinie' THEN 1 ELSE NULL END) nb_chb_indef
 FROM coordination.opportunite a
 LEFT JOIN rip1.vue_chambres_adn b ON a.id_opp::text = b.id_opp::text
-JOIN coordination.chambres c ON st_dwithin(a.geom, c.geom, 30::double precision)
+JOIN coordination.chambres_a_creer c ON st_dwithin(a.geom, c.geom, 30::double precision)
 LEFT JOIN administratif.vue_nb_suf_opp d ON a.id_opp::text = d.id_opp::text
 where a.id_opp like 'OPP_1-8_LT_26301_WDHB_001' or 
 a.id_opp like 'OPP_3-XX_LT_07291_WRMZ_001' or 
@@ -148,13 +148,13 @@ FROM coordination.opportunite o, sum;
 
 CREATE OR REPLACE VIEW coordination.vue_nb_chb_a_creer AS 
 SELECT 
-   c.id_opp,
+   c.id_coord,
    count(c.geom) AS nb_chb_a_creer, 
    count(CASE WHEN fonction = 'Desserte' THEN 1 ELSE NULL END) nb_chb_desserte,
    count(CASE WHEN fonction = 'Transport' THEN 1 ELSE NULL END) nb_chb_transport,
    count(CASE WHEN fonction = 'Indefinie' THEN 1 ELSE NULL END) nb_chb_indef
-FROM coordination.chambres as c 
-GROUP BY c.id_opp;
+FROM coordination.chambres_a_creer as c 
+GROUP BY c.id_coord;
 
 --- Schema : rip1
 --- Table : chambres_adn
@@ -250,7 +250,7 @@ LEFT JOIN rip1.vue_chambres_adn b ON a.id_opp like b.id_opp
 LEFT JOIN administratif.vue_nb_suf_opp d ON a.id_opp like d.id_opp
 LEFT JOIN coordination.vue_rapport_prev_starr e ON a.id_opp like e.id_opp
 LEFT JOIN coordination.vue_rapport_longueur f ON a.id_opp like f.id_opp
-LEFT JOIN coordination.vue_nb_chb_a_creer g ON a.id_opp like g.id_opp
+LEFT JOIN coordination.vue_nb_chb_a_creer g ON a.id_opp like g.id_coord
 GROUP BY 
 a.id_opp,a.nom, a.com_dep,a.emprise, a.travaux,e.prev_starr, a.cables, 
 a.typ_cable, a.prog_dsp, a.debut_trvx, a.moa, d.nb_suf, b.nb_chb_exists, 
@@ -280,7 +280,6 @@ a.com_dep
 FROM coordination.opportunite as a
 LEFT JOIN  rip1.vue_chambres_adn as b on a.id_opp=b.id_opp 
 LEFT JOIN  administratif.vue_nb_suf_opp as d on a.id_opp=d.id_opp
-where statut like 'A présenter'
 group by 
 a.id_opp, com_dep, prev_starr,lg_prev_st, gc_typ_mut, gc_typ_int
 order by id_opp
