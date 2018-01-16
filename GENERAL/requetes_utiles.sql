@@ -140,8 +140,27 @@ ALTER TABLE chaud.route
 ALTER COLUMN geom TYPE geometry(linestring,2154) USING ST_GeometryN(geom, 1);
 
 
+-- OU
 
+  DROP TABLE IF EXISTS tr20_in.cable_linestring_1200007;
+CREATE TABLE  tr20_in.cable_linestring_1200007 AS  
+SELECT cab_id, ST_LineMerge(ST_Collect(geom)) as geom
+FROM tr20_in.cable_linestring
+where cab_id = '1200007'
+GROUP BY cab_id;
 
+ALTER TABLE tr20_in.cable_linestring_1200007 ALTER COLUMN geom type geometry(Linestring, 2154);
+
+-- connaitre les multilinestring
+
+SELECT 
+ result.merge_geom as geom,
+ st_geometrytype(merge_geom) as type,
+ result.cb_id
+FROM
+ (SELECT st_astext(st_linemerge(geom)) as merge_geom, st_geometrytype(geom) as type, cb_id FROM temp.CB) AS result
+ 
+WHERE st_geometrytype(merge_geom) = 'ST_MultiLineString';
 --- ajouter geometrie centroide/point
 
 
@@ -605,3 +624,8 @@ where geom && ST_MakeEnvelope(-73.913891, 40.873781, -73.907229, 40.878251, 4326
 SELECT   array_agg(un_id_opp.id_opp)
  AS id_opp
 FROM     un_id_opp
+
+--- suppression bdd
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+WHERE pg_stat_activity.datname = 'TARGET_DB';
