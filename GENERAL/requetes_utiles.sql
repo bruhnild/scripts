@@ -30,6 +30,16 @@ SELECT populate_geometry_columns('travail.cable'::regclass);
 (SELECT id, type, ST_Multi(ST_Buffer(geom,0))::geometry(MULTIPOLYGON, 2154) FROM travail.invalidgeometry 
 WHERE NOT ST_IsValid(geom));
 
+-- lisser la geometrie d'un polygone
+
+select st_buffer(st_buffer(st_buffer(geom, 30), -2), 20)geom, dn
+FROM analyse_thematique.heat500_agg4_
+;
+-- OU
+select st_buffer(st_buffer(st_buffer(st_simplify(geom,10), 10), -10), 40)geom, dn
+FROM analyse_thematique.heat500_agg4_
+;
+
 --- corriger la géométrie avec la simplification à zero
 update 
 travail.invalidgeometry
@@ -629,3 +639,13 @@ FROM     un_id_opp
 SELECT pg_terminate_backend(pg_stat_activity.pid)
 FROM pg_stat_activity
 WHERE pg_stat_activity.datname = 'TARGET_DB';
+
+--- vue sur deux tables de deux bases de données differentes
+
+CREATE OR REPLACE VIEW emprises_mobilisables.route_adn_ign_2017_2154 AS 
+SELECT t1.id, t1.type, t1.emprise, t1.geom FROM dblink('host=192.168.101.254 port=5432 dbname=reseaux user=postgres password=l0cA!L8:','select id, type, emprise , geom from emprises_mobilisables.route_07_ign_2017_2154')
+AS t1(id varchar, type varchar, emprise varchar, geom geometry) 
+join dblink('host=192.168.101.254 port=5432 dbname=adn_l49 user=postgres password=l0cA!L8:','select commune, opp, geom from administratif.communes')
+AS t2(commune varchar, opp varchar, geom geometry) on st_contains(t2.geom,t1.geom)
+where t2.opp is not null 
+

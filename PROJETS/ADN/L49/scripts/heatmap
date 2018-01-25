@@ -1,0 +1,41 @@
+drop table if exists analyse_thematique.heat500_agg1;
+create table analyse_thematique.heat500_agg1 as 
+SELECT (ST_UnaryUnion(ST_Collect(geom))) geom,'0-15'::varchar as dn 
+  FROM analyse_thematique.heat500
+  where dn >=0 and dn <=15
+  group by dn
+  
+drop table if exists analyse_thematique.heat500_agg2;
+create table analyse_thematique.heat500_agg2 as 
+SELECT (ST_UnaryUnion(ST_Collect(geom))) geom,'16-27'::varchar as dn 
+  FROM analyse_thematique.heat500
+  where dn >=16 and dn <=27
+  group by dn;
+
+drop table if exists analyse_thematique.heat500_agg2_;
+create table analyse_thematique.heat500_agg2_ as 
+SELECT st_union (geom) geom, dn
+  FROM analyse_thematique.heat500_agg2
+  group by dn;
+   
+
+  drop table if exists analyse_thematique.heat500_agg3;
+create table analyse_thematique.heat500_agg3 as 
+SELECT (ST_UnaryUnion(ST_Collect(geom))) geom,'28-47'::varchar as dn 
+  FROM analyse_thematique.heat500
+  where dn >=28 and dn <=47
+  group by dn;
+
+  drop table if exists analyse_thematique.heat500_agg4;
+create table analyse_thematique.heat500_agg4 as 
+SELECT (ST_UnaryUnion(ST_Collect(geom))) geom,'48-93'::varchar as dn 
+  FROM analyse_thematique.heat500
+  where dn >=48 and dn <=93
+  group by dn;
+
+  drop table if exists analyse_thematique.heat500_agg5;
+create table analyse_thematique.heat500_agg5 as 
+SELECT (ST_UnaryUnion(ST_Collect(geom))) geom,'>=93'::varchar as dn 
+  FROM analyse_thematique.heat500
+  where dn >=94 
+  group by dn;

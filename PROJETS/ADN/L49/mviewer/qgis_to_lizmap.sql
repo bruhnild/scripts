@@ -977,3 +977,36 @@ CREATE OR REPLACE VIEW analyse_thematique.vue_cluster_suf AS
   
    FROM analyse_thematique.cluster_suf a
      JOIN administratif.vue_communes b ON st_contains(b.geom, a.circle);
+
+--- Schema : emprises_mobilisables (bdd reseaux)
+--- Table : vue_route_adn_ign_2017_2154
+
+/*CREATE OR REPLACE VIEW emprises_mobilisables.vue_route_adn_ign_2017_2154 AS 
+SELECT row_number() over () AS gid, * 
+from(
+SELECT t1.id, t1.type, t1.emprise, t1.geom FROM dblink('host=192.168.101.254 port=5432 dbname=reseaux user=postgres password=l0cA!L8:','select id, type, emprise , geom from emprises_mobilisables.route_07_ign_2017_2154')
+AS t1(id varchar, type varchar, emprise varchar, geom geometry) 
+join dblink('host=192.168.101.254 port=5432 dbname=adn_l49 user=postgres password=l0cA!L8:','select commune, opp, geom from administratif.communes')
+AS t2(commune varchar, opp varchar, geom geometry) on st_contains(t2.geom,t1.geom)
+where t2.opp is not null 
+union all
+SELECT t1.id, t1.type, t1.emprise, t1.geom FROM dblink('host=192.168.101.254 port=5432 dbname=reseaux user=postgres password=l0cA!L8:','select id, type, emprise , geom from emprises_mobilisables.route_26_ign_2017_2154')
+AS t1(id varchar, type varchar, emprise varchar, geom geometry) 
+join dblink('host=192.168.101.254 port=5432 dbname=adn_l49 user=postgres password=l0cA!L8:','select commune, opp, geom from administratif.communes')
+AS t2(commune varchar, opp varchar, geom geometry) on st_contains(t2.geom,t1.geom)
+where t2.opp is not null )vue
+*/
+
+--- Schema : analyse_thematique 
+--- Table : vue_emprises_mobilisables_26_07
+
+CREATE OR REPLACE VIEW analyse_thematique.vue_emprises_mobilisables_26_07 AS
+ SELECT 
+ row_number() over () AS gid,
+ a.id,
+ a.type,
+ a.emprise,
+ a.geom
+from analyse_thematique.emprises_mobilisables_26_07 as a 
+JOIN administratif.communes b ON st_contains(b.geom, a.geom)
+WHERE b.opp IS NOT NULL;
