@@ -127,6 +127,11 @@ SELECT gid, id, id_source, hauteur, source_hau, elevation, source_ele,
   geom::geometry(Polygon,2154)         --type cast using SRID from multipolygon
 FROM dump;
 
+--- Savoir si il y a des multi geom
+
+  SELECT COUNT(CASE WHEN ST_NumGeometries(geom) > 1 THEN 1 END) AS multi_geom,
+       COUNT(geom) AS total_geom
+FROM analyse_thematique.cluster_suf_union;
 
 --- passer de point à multi point 
 

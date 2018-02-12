@@ -23,7 +23,7 @@ Prerequis:
 -- Liste des tables:
 
 -- bpe (type Point)
--- infra (type linstring) /!\ CORRIGER LA GEOMETRIE AVANT IMPORT
+-- infra (type Linestring) /!\ CORRIGER LA GEOMETRIE AVANT IMPORT
 -- site (type Point)
 -- supports (type Point)
 -- zone_bpe (type Point)
@@ -39,7 +39,7 @@ CREATE SCHEMA IF NOT EXISTS mdz14; -- ou mai14/scf14/til14
 -- Action 3: Création du schéma topologique en 2154
 SELECT topology.CreateTopology('routing', 2154);
 
--- -- Action 4: Correction de la géométrie
+-- Action 4: Correction de la géométrie
 UPDATE mdz14.infra
 SET geom=ST_MakeValid(geom);
 
@@ -63,13 +63,13 @@ UPDATE routing.edge_data a  SET tps_distance=st_length(st_transform(geom,2154))/
 ------===============================================------
 
 -- Action 1: Mettre les tables bpe et site dans le schema travail
--- table bpe
+-- Table bpe
 drop table if exists travail.bpe;
 create table travail.bpe as 
 SELECT *
 FROM mdz14.bpe
 ;
---table site
+--Table site
 drop table if exists travail.site;
 create table travail.site as 
 SELECT *
@@ -135,7 +135,6 @@ JOIN mdz14.zone_bpe as b ON st_contains(b.geom, a.geom)
 JOIN travail.site as c ON st_contains(b.geom, c.geom)
 GROUP BY a.id_bpe
 )
-
 -- Algorithme pgr_kdijkstraPath avec jointure latérale 
 SELECT 
 

@@ -49,6 +49,14 @@ GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA scf14 TO ehennebelle;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA til14 TO ehennebelle;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA cadastre TO ehennebelle;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA travail TO ehennebelle;
+GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA routing TO ehennebelle;
+GRANT ALL ON ALL TABLES IN SCHEMA mdz14 TO ehennebelle;
+GRANT ALL ON ALL TABLES IN SCHEMA mai14 TO ehennebelle;
+GRANT ALL ON ALL TABLES IN SCHEMA scf14 TO ehennebelle;
+GRANT ALL ON ALL TABLES IN SCHEMA til14 TO ehennebelle;
+GRANT ALL ON ALL TABLES IN SCHEMA cadastre TO ehennebelle;
+GRANT ALL ON ALL TABLES IN SCHEMA travail TO ehennebelle;
+GRANT ALL ON ALL TABLES IN SCHEMA routing TO ehennebelle;
 /*Droit d'usage de ces actions*/
 GRANT USAGE ON SCHEMA erdf TO ehennebelle;
 GRANT USAGE ON SCHEMA lotim TO ehennebelle;
@@ -82,6 +90,7 @@ GRANT USAGE ON SCHEMA scf14 TO ehennebelle;
 GRANT USAGE ON SCHEMA til14 TO ehennebelle;
 GRANT USAGE ON SCHEMA cadastre TO ehennebelle;
 GRANT USAGE ON SCHEMA travail TO ehennebelle;
+GRANT USAGE ON SCHEMA routing TO ehennebelle;
 
 /*Permission de création de séquences*/
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA mdz14 TO ehennebelle;
@@ -90,6 +99,7 @@ GRANT USAGE ON ALL SEQUENCES IN SCHEMA scf14 TO ehennebelle;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA til14 TO ehennebelle;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA cadastre TO ehennebelle;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA travail TO ehennebelle;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA routing TO ehennebelle;
 
 /*Suppression des users
 REVOKE ALL ON SCHEMA erdf FROM ehennebelle;
@@ -179,8 +189,31 @@ SELECT nspname
   FROM pg_namespace;
   
   
+-- REA1SSIGNE LES DROITS A ehennebelle
 
+-- GRANT
 SELECT DISTINCT 'GRANT '
     || CASE schemaname WHEN 'pg_catalog' THEN 'USAGE' ELSE 'ALL' END
     || ' ON SCHEMA ' || quote_ident(schemaname) || ' TO ehennebelle;'
 FROM pg_tables;
+
+-- TABLES 
+	SELECT 'ALTER TABLE '|| schemaname || '.' || tablename ||' OWNER TO ehennebelle;'
+FROM pg_tables WHERE NOT schemaname IN ('pg_catalog', 'information_schema')
+ORDER BY schemaname, tablename;
+
+-- SEQUENCES 
+SELECT 'ALTER SEQUENCE '|| sequence_schema || '.' || sequence_name ||' OWNER TO ehennebelle;'
+FROM information_schema.sequences WHERE NOT sequence_schema IN ('pg_catalog', 'information_schema')
+ORDER BY sequence_schema, sequence_name;
+
+-- VUES 
+SELECT 'ALTER VIEW '|| table_schema || '.' || table_name ||' OWNER TO ehennebelle;'
+FROM information_schema.views WHERE NOT table_schema IN ('pg_catalog', 'information_schema')
+ORDER BY table_schema, table_name;
+
+-- VUES MATERIALISEES
+SELECT 'ALTER TABLE '|| oid::regclass::text ||' OWNER TO ehennebelle;'
+FROM pg_class WHERE relkind = 'm'
+ORDER BY oid;
+

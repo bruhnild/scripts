@@ -13,25 +13,11 @@ Modification : Nom : // - Date : // - Motif/nature : //
 --- Schema : administratif
 --- Table : commune
 
-CREATE OR REPLACE VIEW administratif.vue_communes AS 
- SELECT 
-    communes.id,
-    communes.commune,
-    communes.codinsee,
-    communes.dpt,
-    communes.region,
-    communes.epci_2012,
-    communes.zone_amii,
-    communes.x,
-    communes.y,
-    communes.rotation,
-    communes.locaux,
-    communes.moe,
-    communes.ms,
-    communes.opp,
-    communes.geom
-   FROM administratif.communes
-   WHERE communes.opp IS NOT NULL;
+CREATE OR REPLACE VIEW administratif.vue_communes AS
+SELECT *
+FROM administratif.communes
+WHERE communes.opp IS NOT NULL;
+
 
 --- Schema : administratif
 --- Table : vue_adn_suf_majic_2016
@@ -104,8 +90,29 @@ SELECT
 -- Vue : vue_numerisation
 
 CREATE OR REPLACE VIEW coordination.vue_numerisation AS 
- SELECT   
+SELECT 
  row_number() OVER () AS id,
+id_opp, 
+lot, 
+id_prog, 
+id_nro, 
+id_reseau, 
+statut, 
+phase, 
+emprise, 
+nom, 
+support, 
+travaux,  
+sum(longueur) as longueur, 
+debut_trvx, 
+prog_dsp, 
+moa, 
+cdd, 
+commentair, 
+envoi_moe,
+St_linemerge(ST_Union(geom))  as geom
+FROM coordination.numerisation
+group by 
  id_opp, 
  lot, 
  id_prog, 
@@ -117,31 +124,12 @@ CREATE OR REPLACE VIEW coordination.vue_numerisation AS
  nom, 
  support, 
  travaux,  
- sum(longueur) as longueur, 
  debut_trvx, 
  prog_dsp, 
  moa, 
  cdd, 
- commentaire, 
- St_linemerge(ST_Union(geom))  as geom
- FROM coordination.numerisation
- group by 
- id_opp, 
- lot, 
- id_prog, 
- id_nro, 
- id_reseau,
- statut, 
- phase, 
- emprise, 
- nom, 
- support, 
- travaux,  
- debut_trvx, 
- prog_dsp, 
- moa, 
- cdd, 
- commentaire
+ commentair,
+ envoi_moe
  order by id_opp
 ;
 
@@ -1000,13 +988,52 @@ where t2.opp is not null )vue
 --- Schema : analyse_thematique 
 --- Table : vue_emprises_mobilisables_26_07
 
-CREATE OR REPLACE VIEW analyse_thematique.vue_emprises_mobilisables_26_07 AS
- SELECT 
- row_number() over () AS gid,
- a.id,
- a.type,
- a.emprise,
- a.geom
-from analyse_thematique.emprises_mobilisables_26_07 as a 
-JOIN administratif.communes b ON st_contains(b.geom, a.geom)
-WHERE b.opp IS NOT NULL;
+CREATE OR REPLACE VIEW analyse_thematique.vue_emprises_mobilisables_26_07 AS 
+SELECT 
+row_number() OVER () AS id,
+a.dn, 
+a.type, 
+a.emprise, 
+a.heatmap, 
+a.geom, 
+a.commune
+FROM analyse_thematique.emprises_mobilisables_26_07 as a
+JOIN  administratif.communes as b
+ON a.commune = b.commune
+WHERE b.opp is not null;
+
+--- Schema : analyse_thematique 
+--- Table : vue_communes_centroides
+
+
+CREATE OR REPLACE VIEW analyse_thematique.vue_communes_centroides AS
+ SELECT row_number() OVER () AS gid,
+    st_centroid(geom) as geom,
+    commune,
+    codinsee,
+    dpt,
+    region,
+  emprise_mob,
+    num_priorite
+   FROM administratif.communes 
+  WHERE opp IS NOT NULL;
+
+--- Schema : coordination 
+--- Table : vue_opportunite_pins
+
+CREATE OR REPLACE VIEW coordination.vue_opportunite_pins AS 
+SELECT id_opp, ST_Extent(geom) AS bounding_box , ST_SetSRID(ST_Extent(geom),2154) as geom, st_centroid(ST_SetSRID(ST_Extent(geom),2154)) as centroid
+FROM coordination.opportunite as a
+where id_opp is not null
+group by id_opp
+;
+
+--- Schema : coordination 
+--- Table : vue_numerisation_pins
+
+CREATE OR REPLACE VIEW coordination.vue_numerisation_pins AS 
+SELECT id_opp, ST_Extent(geom) AS bounding_box , ST_SetSRID(ST_Extent(geom),2154) as geom, st_centroid(ST_SetSRID(ST_Extent(geom),2154)) as centroid
+FROM coordination.numerisation as a
+where id_opp is not null
+group by id_opp
+;

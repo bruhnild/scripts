@@ -957,23 +957,23 @@ SELECT geom, dn
 drop table if exists analyse_thematique.heatmap;
 create table analyse_thematique.heatmap as 
 select dn, '500'::varchar as rayon, geom
-from analyse_thematique.heat500
+from analyse_thematique.heat_500
 union all
 select dn, '1000'::varchar as rayon, geom
-from analyse_thematique.heat1000
+from analyse_thematique.heat_1000
 union all
 select dn, '1500'::varchar as rayon, geom
-from analyse_thematique.heat1500
+from analyse_thematique.heat_1500
 union all
 select dn, '2000'::varchar as rayon, geom
-from analyse_thematique.heat2000
+from analyse_thematique.heat_2000
 union all
 select dn, '3000'::varchar as rayon, geom
-from analyse_thematique.heat3000
+from analyse_thematique.heat_3000
 union all
 select dn, '4000'::varchar as rayon, geom
-from analyse_thematique.heat4000
+from analyse_thematique.heat_4000
 union all
 select dn, '5000'::varchar as rayon, geom
-from analyse_thematique.heat5000
+from analyse_thematique.heat_5000
 ;

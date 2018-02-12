@@ -175,7 +175,7 @@ SELECT
 --- Vue : bounding_box
 
 CREATE OR REPLACE VIEW coordination.vue_bounding_box AS 
-SELECT id_opp, ST_Extent(geom) AS bounding_box , ST_SetSRID(ST_Extent(geom),2154) as geom
+SELECT id_opp, ST_Extent(geom) AS bounding_box , ST_SetSRID(ST_Extent(geom),2154) as geom, st_centroid(ST_SetSRID(ST_Extent(geom),2154)) as centroid
 FROM coordination.opportunite as a
 group by id_opp
 ;
@@ -244,7 +244,8 @@ SELECT
    CASE WHEN g.nb_chb_a_creer IS NULL THEN 0 ELSE g.nb_chb_a_creer END AS  nb_chb_a_creer,
    CASE WHEN g.nb_chb_desserte IS NULL THEN 0 ELSE g.nb_chb_desserte END AS  nb_chb_desserte,
    CASE WHEN g.nb_chb_transport IS NULL THEN 0 ELSE g.nb_chb_transport END AS  nb_chb_transport,
-   CASE WHEN g.nb_chb_indef IS NULL THEN 0 ELSE g.nb_chb_indef END AS  nb_chb_indef
+   CASE WHEN g.nb_chb_indef IS NULL THEN 0 ELSE g.nb_chb_indef END AS  nb_chb_indef,
+   a.statut
 FROM coordination.opportunite a
 LEFT JOIN rip1.vue_chambres_adn b ON a.id_opp like b.id_opp
 LEFT JOIN administratif.vue_nb_suf_opp d ON a.id_opp like d.id_opp
@@ -254,15 +255,16 @@ LEFT JOIN coordination.vue_nb_chb_a_creer g ON a.id_opp like g.id_coord
 GROUP BY 
 a.id_opp,a.nom, a.com_dep,a.emprise, a.travaux,e.prev_starr, a.cables, 
 a.typ_cable, a.prog_dsp, a.debut_trvx, a.moa, d.nb_suf, b.nb_chb_exists, 
-f.longueur_max, g.nb_chb_a_creer, g.nb_chb_desserte,g.nb_chb_transport, g.nb_chb_indef
+f.longueur_max, g.nb_chb_a_creer, g.nb_chb_desserte,g.nb_chb_transport, g.nb_chb_indef, a.statut
 order by id_opp DESC
 )vue;
+
 
 
 --- Schema : rapport
 --- Table : opportunites_typegc
 
-CREATE OR REPLACE VIEW coordination.vue_rapport_opportunites_typegc AS 
+CREATE OR REPLACE VIEW coordination.vue_rapport_opportunites_typegc AS
 SELECT 
 -- informations
 row_number() over () AS id,
@@ -276,13 +278,16 @@ gc_typ_int,
 sum(CASE WHEN a.gc_typ_int IS null THEN null ELSE longueur END) as lg_typ_int,
 sum(longueur) as longueur,
 -- couts
-a.com_dep
+a.com_dep,
+-- statut
+a.statut
 FROM coordination.opportunite as a
 LEFT JOIN  rip1.vue_chambres_adn as b on a.id_opp=b.id_opp 
 LEFT JOIN  administratif.vue_nb_suf_opp as d on a.id_opp=d.id_opp
 group by 
-a.id_opp, com_dep, prev_starr,lg_prev_st, gc_typ_mut, gc_typ_int
+a.id_opp, com_dep, prev_starr,lg_prev_st, gc_typ_mut, gc_typ_int, a.statut
 order by id_opp
 ;
+
 
 
