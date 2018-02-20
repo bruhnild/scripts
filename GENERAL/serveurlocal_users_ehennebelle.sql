@@ -15,7 +15,7 @@ GRANT CONNECT ON DATABASE reseaux TO ehennebelle;
 GRANT CONNECT ON DATABASE territoire TO ehennebelle;
 GRANT CONNECT ON DATABASE covage_14 TO ehennebelle;
 
-
+GRANT ALL PRIVILEGES ON DATABASE covage_14 TO ehennebelle;
 /*Actions permises par les utilisateur*/
 GRANT SELECT ON ALL TABLES IN SCHEMA erdf TO ehennebelle;
 GRANT SELECT ON ALL TABLES IN SCHEMA lotim TO ehennebelle;
@@ -57,6 +57,8 @@ GRANT ALL ON ALL TABLES IN SCHEMA til14 TO ehennebelle;
 GRANT ALL ON ALL TABLES IN SCHEMA cadastre TO ehennebelle;
 GRANT ALL ON ALL TABLES IN SCHEMA travail TO ehennebelle;
 GRANT ALL ON ALL TABLES IN SCHEMA routing TO ehennebelle;
+GRANT CREATE ON DATABASE covage_14 TO ehennebelle;
+
 /*Droit d'usage de ces actions*/
 GRANT USAGE ON SCHEMA erdf TO ehennebelle;
 GRANT USAGE ON SCHEMA lotim TO ehennebelle;

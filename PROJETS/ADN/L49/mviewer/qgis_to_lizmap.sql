@@ -1037,3 +1037,25 @@ FROM coordination.numerisation as a
 where id_opp is not null
 group by id_opp
 ;
+
+--- Schema : coordination 
+--- Table : chambres_a_creer
+-- Met à jour le champ url de chambres_a_creer à partir du champurl d'opportunite
+
+CREATE OR REPLACE FUNCTION update_url() RETURNS TRIGGER AS $$
+BEGIN
+--  IF NEW.url != OLD.url  THEN
+    UPDATE coordination.chambres_a_creer a
+    SET url=b.url
+  FROM coordination.opportunite b 
+  WHERE a.id_coord= b.id_opp;
+--  END IF;
+--  RETURN NEW;
+  RETURN NULL;
+END;
+$$ LANGUAGE 'plpgsql';
+
+DROP TRIGGER IF EXISTS trg_update_url ON coordination.opportunite;
+CREATE TRIGGER trg_update_url
+AFTER INSERT OR UPDATE OR DELETE ON coordination.opportunite
+FOR EACH ROW EXECUTE PROCEDURE update_url();

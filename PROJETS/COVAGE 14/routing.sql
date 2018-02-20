@@ -28,13 +28,13 @@ Prerequis:
 -- supports (type Point)
 -- zone_bpe (type Point)
 
--- Action 2: Suppression des paramètres précents et créations des nouveaux
+-- Action 2: Suppression des paramètres précents et créations des nouveaux 
 ALTER TABLE mdz14.infra DROP COLUMN IF EXISTS topo CASCADE;
 DROP SCHEMA IF EXISTS topology CASCADE;
 DROP SCHEMA IF EXISTS routing CASCADE;
 CREATE EXTENSION postgis_topology;
-ALTER SCHEMA mdz14 RENAME TO mdz14%pm%; -- ou ALTER SCHEMA mai14/scf14/til14 RENAME TO mai14%pm%/scf14%pm%/til14%pm%
-CREATE SCHEMA IF NOT EXISTS mdz14; -- ou mai14/scf14/til14
+--ALTER SCHEMA mdz14 RENAME TO mdz14%pm%; -- ou ALTER SCHEMA mai14/scf14/til14 RENAME TO mai14%pm%/scf14%pm%/til14%pm%
+--CREATE SCHEMA IF NOT EXISTS mdz14; -- ou mai14/scf14/til14
 
 -- Action 3: Création du schéma topologique en 2154
 SELECT topology.CreateTopology('routing', 2154);
