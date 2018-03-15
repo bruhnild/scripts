@@ -367,6 +367,9 @@ ALTER TABLE entree_est.out_pjtentreeest_bati_bg
 
 update referentiel.pf001_programmationurbaine_mlyon_3946 set type_pu = 'nc' where type_pu is null;
 
+-- Ajouter nouvelle colonne 
+ALTER TABLE pois.osm_2018 ADD COLUMN usage_1 varchar(254);
+
 ---- renommer colonne
 
 ALTER TABLE distributors RENAME COLUMN address TO city;
@@ -673,3 +676,39 @@ DROP TRIGGER IF EXISTS trg_update_url ON coordination.opportunite;
 CREATE TRIGGER trg_update_url
 AFTER INSERT OR UPDATE OR DELETE ON coordination.opportunite
 FOR EACH ROW EXECUTE PROCEDURE update_url();
+
+
+ SELECT id, ('OPP_'||pr ||'-'|| nro_ref||'-'||nbr_doublon) as id_opp
+   FROM ( WITH sequenc AS (
+   SELECT
+   a.id,
+   a.commune,
+   b.nro_ref,
+   CASE WHEN b.pr IS NULL THEN 'XX'::character varying ELSE b.pr END AS pr,
+   CASE WHEN c.nbr_doublon = 1 THEN 1 ELSE c.nbr_doublon END AS nbr_doublon
+   FROM coordination.chaussee_2018_07 as a
+   JOIN  administratif.communes as b ON a.commune = b.commune
+   JOIN coordination.vue_doublons_nro_all as c ON b.nro_ref = c.id_nro 
+                )
+         SELECT *
+         FROM sequenc
+          ) concat
+
+
+
+SELECT a.id, 'OPP_'||pr ||'-'|| nro_ref||'-'||lpad(CAST(row_number() OVER (PARTITION BY nro_ref ORDER BY a.id)AS VARCHAR), 3, '0')id_opp
+FROM coordination.chaussee_2018_07 as a
+JOIN  administratif.communes as b USING (commune)
+JOIN  coordination.vue_doublons_nro_all  as c USING (nro_ref)
+order by id_opp;
+
+--- Supprimer table récalcitrante (pid)
+SELECT *
+  FROM pg_locks l
+  JOIN pg_class t ON l.relation = t.oid AND t.relkind = 'r'
+ WHERE t.relname = 'numerisation_test';
+ 
+ SELECT pg_cancel_backend('82752');
+
+--- Connaitre la taille de toues les bases de données
+ SELECT pg_database.datname, pg_size_pretty(pg_database_size(pg_database.datname)) AS size FROM pg_database;

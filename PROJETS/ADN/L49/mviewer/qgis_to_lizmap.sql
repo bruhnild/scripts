@@ -1059,3 +1059,310 @@ DROP TRIGGER IF EXISTS trg_update_url ON coordination.opportunite;
 CREATE TRIGGER trg_update_url
 AFTER INSERT OR UPDATE OR DELETE ON coordination.opportunite
 FOR EACH ROW EXECUTE PROCEDURE update_url();
+
+
+--- Schema : coordination 
+--- Table : opportunite
+-- Met à jour le champ url d'opportunite lorsque le champs statut = 'Traitée'
+CREATE OR REPLACE FUNCTION update_url_opp() RETURNS TRIGGER AS $$
+BEGIN
+
+    NEW.url :=        
+      concat('/adn/document/rapports/',
+     NEW.envoi_moe,
+      '/',
+  NEW.id_opp,
+  '.pdf'
+     ) ;
+  RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+DROP TRIGGER IF EXISTS trg_update_url_opp ON coordination.opportunite;
+CREATE TRIGGER trg_update_url_opp
+BEFORE INSERT OR UPDATE OF 
+statut 
+ON coordination.opportunite
+FOR EACH ROW 
+WHEN (NEW.statut = 'Traitée')
+EXECUTE PROCEDURE update_url_opp();
+
+--- Schema : coordination 
+--- Table : numerisation
+-- Met à jour le champ travaux d'opportunite à partir du champ support
+CREATE OR REPLACE FUNCTION update_travaux_num() RETURNS TRIGGER AS $$
+BEGIN
+
+    NEW.travaux :=        
+      CASE
+      WHEN NEW.support like 'Souterrain FT' THEN 'Souterrain FT'
+    WHEN NEW.support like 'Aerien FT' THEN 'Aerien FT'
+    WHEN NEW.support like 'Refection de voirie' THEN 'Refection de voirie'
+    WHEN NEW.support like 'Souterrain FT' THEN 'Souterrain FT'
+    WHEN NEW.support like 'Souterrain HT' OR NEW.support like 'Souterrain BT' OR NEW.support like 'Souterrain EP' THEN 'Souterrain HT/BT/EP'
+    WHEN NEW.support like 'Aerien HT' OR NEW.support like 'Aerien BT' OR NEW.support like 'Eclairage public' THEN 'Aerien HT/BT/EP'
+    WHEN NEW.support like 'Assainissement' OR NEW.support like 'Eau potable' OR NEW.support like 'Eau pluviale' OR NEW.support like 'Eaux usees' THEN 'AEP/EP/EU'
+    WHEN NEW.support like 'Feux tricolores' OR NEW.support like 'Signalisation routiere' THEN 'Signalisation/feux tricolores'
+    WHEN NEW.support like 'Chauffage' OR NEW.support like 'Climatisation' THEN 'Chauffage/climatisation'
+    WHEN NEW.support like 'Gaz' OR NEW.support like 'Combustibles' OR NEW.support like 'Hydrocarbures' THEN 'Gaz/hydrocarbures'
+    END;
+  RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+DROP TRIGGER IF EXISTS trg_update_travaux_num ON coordination.numerisation;
+CREATE TRIGGER trg_update_travaux_num
+BEFORE INSERT OR UPDATE OF 
+geom 
+ON coordination.numerisation
+FOR EACH ROW 
+EXECUTE PROCEDURE update_travaux_num();
+
+--- Schema : administratif 
+--- Table : communes
+-- Met à jour le champ opp de communes à partir du champ id_opp d'opportunite
+
+CREATE OR REPLACE FUNCTION update_opp() RETURNS TRIGGER AS $$
+BEGIN
+--  IF NEW.url != OLD.url  THEN
+    UPDATE administratif.communes a
+    SET opp= CASE WHEN b.statut like 'Traitée' THEN id_opp ELSE null END
+    FROM coordination.opportunite b 
+    WHERE ST_INTERSECTS (b.geom,a.geom);
+--  END IF;
+--  RETURN NEW;
+  RETURN NULL;
+END;
+$$ LANGUAGE 'plpgsql';
+
+DROP TRIGGER IF EXISTS trg_update_opp ON coordination.opportunite;
+CREATE TRIGGER trg_update_opp
+AFTER INSERT OR UPDATE OR DELETE ON coordination.opportunite
+FOR EACH STATEMENT EXECUTE PROCEDURE update_opp();
+
+--- Schema : coordination 
+--- Table : numerisation
+-- Met à jour le champ id_opp de numerisation àà la création d'entités
+CREATE OR REPLACE FUNCTION update_id_opp() RETURNS TRIGGER AS $$
+BEGIN
+
+    NEW.id_opp :=        
+      concat('OPP_',
+      -- cherche id prog sinon lot
+      (CASE 
+        WHEN NEW.lot like '1' and NEW.id_prog = 'NULL' THEN '1-XX'::character varying 
+            WHEN NEW.lot like '2' and NEW.id_prog = 'NULL' THEN '2-XX'::character varying 
+            WHEN NEW.lot like '3' and NEW.id_prog = 'NULL' THEN '3-XX'::character varying 
+            WHEN NEW.lot like '4' and NEW.id_prog = 'NULL' THEN '4-XX'::character varying 
+          ELSE NEW.id_prog END),
+      '_',
+      -- cherche nro ref
+      NEW.id_nro,
+      '_',
+      -- incrémente en fonction du nombre de fois que l'id_nro a été utilisé
+       lpad((SELECT cast(nbr_doublon+1 as varchar) test FROM coordination.vue_doublons_nro_all where nro_ref like  NEW.id_nro),3,'0')) 
+      as id_opp ;
+  RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+DROP TRIGGER IF EXISTS trg_update_id_opp ON coordination.numerisation;
+CREATE TRIGGER trg_update_id_opp
+BEFORE INSERT OR UPDATE OF 
+geom 
+ON coordination.numerisation
+FOR EACH ROW EXECUTE PROCEDURE update_id_opp();
+
+
+
+
+
+--- Schema : coordination 
+--- Table : vue_doublons_nro_all
+/*CREATE OR REPLACE VIEW coordination.vue_doublons_nro_all AS
+ SELECT doublons_nro.nbr_doublon,
+    doublons_nro.id_nro AS nro_ref
+   FROM ( WITH compte AS (
+                 SELECT numerisation.id_nro,
+                    numerisation.id_opp
+                   FROM coordination.numerisation
+                  GROUP BY numerisation.id_nro, numerisation.id_opp
+                  ORDER BY numerisation.id_nro
+                )
+         SELECT count(compte.id_nro) + 1 AS nbr_doublon,
+            compte.id_nro
+           FROM compte
+          GROUP BY compte.id_nro) doublons_nro
+  ORDER BY doublons_nro.nbr_doublon DESC;
+*/
+--- Schema : coordination 
+--- Table : vue_doublons_nro_all
+
+ CREATE OR REPLACE VIEW coordination.vue_doublons_nro_all AS
+ SELECT doublons_nro.nbr_doublon,
+    doublons_nro.id_nro AS nro_ref
+   FROM ( WITH compte AS (
+                 SELECT numerisation.id_nro,
+                    numerisation.id_opp
+                   FROM coordination.numerisation
+                  GROUP BY numerisation.id_nro, numerisation.id_opp
+                  ORDER BY numerisation.id_nro
+                )
+         SELECT count(compte.id_nro) AS nbr_doublon,
+            compte.id_nro
+           FROM compte
+          GROUP BY compte.id_nro) doublons_nro
+UNION ALL
+ SELECT 0 AS nbr_doublon,
+    doublons_nro.nro_ref
+   FROM ( WITH compte AS (
+                 SELECT a.nro_ref,
+                    NULL::character varying AS id_opp
+                   FROM administratif.communes a
+                  GROUP BY a.nro_ref, NULL::character varying
+                  ORDER BY a.nro_ref
+                )
+         SELECT count(compte.nro_ref) AS nbr_doublon,
+            compte.nro_ref
+           FROM compte
+          GROUP BY compte.nro_ref) doublons_nro
+  WHERE NOT (doublons_nro.nro_ref::text IN ( SELECT a.id_nro
+           FROM coordination.numerisation a
+          WHERE a.id_nro IS NOT NULL))
+  ORDER BY 1 DESC;
+
+/*
+-- MAJ chausees
+  ALTER TABLE coordination.chausees ADD COLUMN communes varchar(254);
+ALTER TABLE coordination.chausees ADD COLUMN id_opp varchar(254);
+
+UPDATE coordination.chausees as a 
+SET communes = b.commune
+FROM administratif.communes as b 
+
+WHERE ST_Intersects(b.geom,a.geom)
+
+--- Schema : coordination 
+--- Table : chaussee_2018_07_opp
+--- Incrémentation id_opp
+  drop table if exists coordination.chaussee_2018_07_opp;
+create table coordination.chaussee_2018_07_opp as 
+SELECT id, nbr_doublon, 'OPP_'||pr ||'_'|| nro_ref||'_'||lpad(CAST(row_number() OVER (PARTITION BY nro_ref, nbr_doublon ORDER BY id) + nbr_doublon - 1 AS VARCHAR), 3, '0')id_opp, communes, priorite, nom_rd,geom
+FROM ( WITH sequenc AS (
+SELECT 
+  a.id as id , 
+  a.communes,
+  a.geom,
+  b.nro_ref,
+  c.nbr_doublon +1 as nbr_doublon,
+  a.priorite,
+  a.nom_rd,
+  CASE 
+   WHEN b.lot = 1 and b.pr IS NULL THEN '1-XX'::character varying 
+   WHEN b.lot = 2 and b.pr IS NULL THEN '2-XX'::character varying 
+   WHEN b.lot = 3 and b.pr IS NULL THEN '3-XX'::character varying 
+   WHEN b.lot = 4 and b.pr IS NULL THEN '4-XX'::character varying 
+   ELSE b.pr END AS pr
+FROM coordination.chausees as a
+JOIN  administratif.communes as b ON a.communes=b.commune
+JOIN  coordination.vue_doublons_nro_all  as c USING (nro_ref)
+order by id_opp
+)
+SELECT *
+FROM sequenc
+) concat
+;
+
+
+DROP table if exists  coordination.chaussee_2018_07_opp_linestring ;
+CREATE TABLE   coordination.chaussee_2018_07_opp_linestring AS                       --poly will be the new polygon table
+WITH dump AS (
+  SELECT
+   id, nbr_doublon, id_opp, communes, priorite, nom_rd,
+                    --columns from your multipolygon table 
+      (ST_DUMP(geom)).geom AS geom 
+   FROM coordination.chaussee_2018_07_opp                          --the name of your multipolygon table
+) 
+SELECT id, nbr_doublon, id_opp, communes, priorite, nom_rd,
+  geom::geometry(Linestring,2154)         --type cast using SRID from multipolygon
+FROM dump;
+
+ALTER TABLE coordination.chaussee_2018_07_opp_linestring ADD COLUMN gid SERIAL PRIMARY KEY;
+
+
+INSERT INTO coordination.numerisation (
+geom, 
+id_opp, 
+lot, 
+id_prog, 
+id_nro, 
+id_reseau, 
+insee, 
+com_dep, 
+statut, 
+phase, 
+emprise, 
+nom, 
+support, 
+travaux, 
+typ_reseau, 
+longueur, 
+debut_trvx, 
+prog_dsp, 
+moa, 
+cdd, 
+commentair, 
+envoi_moe, 
+date
+
+
+
+)
+
+SELECT 
+a.geom, 
+id_opp, 
+b.lot, 
+b.pr as id_prog, 
+b.nro_ref as id_nro, 
+'R001'::varchar as id_reseau, 
+b.codinsee as insee, 
+a.communes as com_dep, 
+'A étudier'::varchar as statut, 
+'Numerisation'::varchar as phase, 
+concat(a.communes,'-',nom_rd) as emprise, 
+concat('COO_Réfection des Voiries_Renouvellement-des-couches-des-surfaces(',a.communes,')_',a.nom_rd,'_ Chausées')::varchar as nom, 
+'Refection de voirie'::varchar as support, 
+'Refection de voirie'::varchar as travaux, 
+null::varchar as typ_reseau, 
+st_length (a.geom)::integer as longueur, 
+CASE 
+  WHEN priorite like '1' THEN 'Ete 2018'
+  WHEN priorite like '1_bis' THEN 'Automne 2018'
+  WHEN priorite like '2' THEN 'Printemps 2019'
+  WHEN priorite like '3' THEN 'Printemps 2020' 
+  END::varchar as debut_trvx, 
+b.prog_dsp, 
+'Département de l''Ardèche'::varchar as moa,
+b.cdd, 
+CASE 
+  WHEN priorite like '1' THEN 'Priorité 1 : Les travaux devront être réalisés pour le 1er Juillet 2018'
+  WHEN priorite like '1_bis' THEN 'Priorité 1 bis : Les travaux pourront être réalisés à compter du 1er septembre 2018, sous réserve du budget disponible à l’issue des priorités 1. Les opérations non réalisées au second semestre seront reportées en 2019'
+  WHEN priorite like '2' THEN 'Priorité 2 : Les travaux seront réalisés sur les exercices 2019 et 2020'
+  WHEN priorite like '3' THEN 'Priorité 3 : Les travaux seront réalisés sur les exercices 2019 et 2020' 
+  END::varchar as commentair, 
+'S06/2018'::varchar as envoi_moe, 
+date '2018-03-01' - integer '7' as date
+FROM coordination.chaussee_2018_07_opp_linestring as a
+JOIN  administratif.communes as b ON a.communes = b.commune
+order by debut_trvx
+
+*/
+
+
+UPDATE administratif.communes a
+SET phase_prog = phase
+FROM rip2.adn_programmation b 
+WHERE ST_INTERSECTS (a.geom, b.geom)

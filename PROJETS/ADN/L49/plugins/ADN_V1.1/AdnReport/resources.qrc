@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/AdnReport" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
