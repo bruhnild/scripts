@@ -285,46 +285,46 @@ ETAPE 3 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
 
 -- PIETONS
 ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_5mn ADD COLUMN surf_hab integer;
-	
+    
 UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_5mn a
 SET surf_hab = t.sumPrice
 FROM batiments.osm_2018 AS p
 INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
-	from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_5mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
-	group by a.st_union, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_5mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom)
+    group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
     ;
 
 ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_10mn ADD COLUMN surf_hab integer;
-	
+    
 UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_10mn a
 SET surf_hab = t.sumPrice
 FROM batiments.osm_2018 AS p
 INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
-	from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_10mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
-	group by a.st_union, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_10mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom)
+    group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
     ;
 
 ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_20mn ADD COLUMN surf_hab integer;
-	
+    
 UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_20mn a
 SET surf_hab = t.sumPrice
 FROM batiments.osm_2018 AS p
 INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
-	from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_20mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
-	group by a.st_union, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_20mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom)
+    group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
     ;
@@ -332,46 +332,46 @@ INNER JOIN
 -- VELOS
 
 ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_2mn ADD COLUMN surf_hab integer;
-	
+    
 UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_2mn a
 SET surf_hab = t.sumPrice
 FROM batiments.osm_2018 AS p
 INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
-	from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_2mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
-	group by a.st_union, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_2mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom)
+    group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
     ;
 
 ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_4mn ADD COLUMN surf_hab integer;
-	
+    
 UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_4mn a
 SET surf_hab = t.sumPrice
 FROM batiments.osm_2018 AS p
 INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
-	from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_4mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
-	group by a.st_union, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_4mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom)
+    group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
     ;
 
 ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_8mn ADD COLUMN surf_hab integer;
-	
+    
 UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_8mn a
 SET surf_hab = t.sumPrice
 FROM batiments.osm_2018 AS p
 INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
-	from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_8mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
-	group by a.st_union, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_8mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom)
+    group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
     ;
@@ -379,31 +379,31 @@ INNER JOIN
 -- VOITURES
 
 ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_2mn ADD COLUMN surf_hab integer;
-	
+    
 UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_2mn a
 SET surf_hab = t.sumPrice
 FROM batiments.osm_2018 AS p
 INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
-	from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_2mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
-	group by a.st_union, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_2mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom)
+    group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
     ;
 
 ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_4mn ADD COLUMN surf_hab integer;
-	
+    
 UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_4mn a
 SET surf_hab = t.sumPrice
 FROM batiments.osm_2018 AS p
 INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
-	from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_4mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
-	group by a.st_union, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_4mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom)
+    group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
     ;
@@ -416,8 +416,264 @@ ETAPE 4 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
 */
 
 -- POSTE 1 RELOCALISEE
+-- PIETONS
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_pietons_5mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_pietons_5mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.geom as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_pietons_5mn a, batiments.osm_2018 b
+    where st_intersects(a.geom, b.geom)
+    group by a.geom, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
 
--- POSTE 1
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_pietons_10mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_pietons_10mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.geom as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_pietons_10mn a, batiments.osm_2018 b
+    where st_intersects(a.geom, b.geom)
+    group by a.geom, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_pietons_20mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_pietons_20mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.geom as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_pietons_20mn a, batiments.osm_2018 b
+    where st_intersects(a.geom, b.geom)
+    group by a.geom, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+-- VELOS
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_velos_2mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_velos_2mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.geom as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_velos_2mn a, batiments.osm_2018 b
+    where st_intersects(a.geom, b.geom)
+    group by a.geom, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_velos_4mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_velos_4mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.geom as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_velos_4mn a, batiments.osm_2018 b
+    where st_intersects(a.geom, b.geom)
+    group by a.geom, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_velos_8mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_velos_8mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.geom as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_velos_8mn a, batiments.osm_2018 b
+    where st_intersects(a.geom, b.geom)
+    group by a.geom, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+-- VOITURES
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_voiture_2mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_voiture_2mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.geom as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_voiture_2mn a, batiments.osm_2018 b
+    where st_intersects(a.geom, b.geom)
+    group by a.geom, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_voiture_4mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_voiture_4mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.geom as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_voiture_4mn a, batiments.osm_2018 b
+    where st_intersects(a.geom, b.geom)
+    group by a.geom, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+-- POSTE 2
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_5mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_5mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_5mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
+    group by a.st_union, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_10mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_10mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_10mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
+    group by a.st_union, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_20mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_20mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_pietons_20mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
+    group by a.st_union, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+-- VELOS
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_2mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_2mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_2mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
+    group by a.st_union, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_4mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_4mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_4mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
+    group by a.st_union, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_8mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_8mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_velos_8mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
+    group by a.st_union, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+-- VOITURES
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_2mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_2mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_2mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
+    group by a.st_union, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+
+ALTER TABLE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_4mn ADD COLUMN surf_hab integer;
+    
+UPDATE routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_4mn a
+SET surf_hab = t.sumPrice
+FROM batiments.osm_2018 AS p
+INNER JOIN
+    (
+    select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
+    from routing.ST_MakePolygon_ST_ExteriorRing_postereloc_2_voiture_4mn a, batiments.osm_2018 b
+    where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
+    group by a.st_union, nom_del_fr
+    ) t
+    ON t.nom_del_fr = p.nom_del_fr
+    ;
+/*
+-------------------------------------------------------------------------------------
+ETAPE 4 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
+          CONSOLIDATION TABLES DANS SCHEMA ANALYSES
+-------------------------------------------------------------------------------------
+*/
+
+-- POSTE RELOCALISEE
 
 drop table if exists analyses.st_makepolygon_st_exteriorring_postereloc_pietons_5mn;
 create table analyses.st_makepolygon_st_exteriorring_postereloc_pietons_5mn as 
@@ -501,7 +757,6 @@ ADD COLUMN gid SERIAL PRIMARY KEY;
 
 -- POSTE 1 RELOCALISEE ET POSTE 2
 
--- POSTE 1
 
 drop table if exists analyses.st_makepolygon_st_exteriorring_postereloc_2_pietons_5mn;
 create table analyses.st_makepolygon_st_exteriorring_postereloc_2_pietons_5mn as 

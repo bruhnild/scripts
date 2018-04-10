@@ -1,0 +1,375 @@
+/*
+-------------------------------------------------------------------------------------
+Auteur : Marine FAUCHER (METIS)
+Date de création : 27/03/2018
+Objet : Préparer la table de suivi des coordination pour le tableau de bord en pf
+Modification : Nom : ///// - Date : date_de_modif - Motif/nature : //////
+
+-------------------------------------------------------------------------------------
+*/
+
+--- Schema : dashboard
+--- Table : t_suivi
+--- Traitement : Création table t_suivi
+
+
+SET search_path TO adn_l49, dashboard;
+
+DROP TABLE IF EXISTS t_suivi CASCADE;
+
+CREATE TABLE t_suivi(	
+	id SERIAL PRIMARY KEY,
+	lot VARCHAR(1) NOT NULL, -- LOT GEO MS
+	cdd VARCHAR(15) NOT NULL, -- CDD ADN
+	realisation VARCHAR(30) , -- Etude d'opportunité réalisée par
+	mission_moe VARCHAR(15), -- Mission MOE en cours
+	id_prog VARCHAR(4) , -- ID prévision DSP
+	prog_dsp VARCHAR(4) , -- Date prévision DSP
+	numero VARCHAR (3) , -- n° oppportunité sur la PR (xyz)
+	id_nro VARCHAR(15)  , -- Identifiant NRO
+	nom VARCHAR(254) NOT NULL, -- Nom Coordination
+	id_coord VARCHAR(30) NOT NULL, -- ID Chantier (METIS)
+	statut VARCHAR(15) NOT NULL, -- Statut projet chez METIS
+	insee VARCHAR(5) NOT NULL, -- INSEE
+	com_dep VARCHAR(254) NOT NULL, -- Commune départ
+	emprise VARCHAR(254) NOT NULL, -- Emprise
+	travaux VARCHAR(50) NOT NULL, -- Type de travaux
+	longueur INTEGER NOT NULL, -- Mètres linéaires estimés (ml)
+	debut_trvx VARCHAR(20), -- Début des travaux
+	duree_trvx VARCHAR(30), -- Durée des travaux
+	moa VARCHAR(254), -- MOA  
+	moa_del VARCHAR(50), -- MOA délégué
+	moa_be VARCHAR(50), -- MOE / BE
+	ent_tvx VARCHAR(50), -- ENT. TVX
+	contacts VARCHAR(254), -- Contacts
+	analys_cdd VARCHAR(254), -- Analyse CDD
+	repons_cdd VARCHAR(254), -- Réponse CDD
+	dat_repons VARCHAR(30), -- Date réponse
+	valid_tech VARCHAR(30), -- Validation technique
+	montant_ht VARCHAR(20), -- Montant € HT
+	valid_fina VARCHAR(50), -- Validation financière
+	date_aig VARCHAR(20), -- Date Aiguillage
+	retour_ter VARCHAR(254), -- Retour terrain
+	entrepris VARCHAR(50), -- Entreprise
+	gestion VARCHAR(50), -- Géré par
+	ouv_chanti VARCHAR(50), -- Ouverture chantier
+	rec_ouvrag VARCHAR(50), -- Réception ouvrage
+	doe_fourni VARCHAR(50), -- DOE fourni
+	commentair VARCHAR(254), -- Commentaire
+	envoi_moe VARCHAR(10) NOT NULL -- Envoi MOE
+	);
+	
+DROP INDEX IF EXISTS lot_idx; CREATE INDEX  lot_idx ON t_suivi(lot);
+DROP INDEX IF EXISTS cdd_idxidx; CREATE INDEX  cdd_idx ON t_suivi(cdd);
+DROP INDEX IF EXISTS id_prog_idx; CREATE INDEX  id_prog_idx ON t_suivi(id_prog);
+DROP INDEX IF EXISTS prog_dsp_idx; CREATE INDEX  prog_dsp_idx ON t_suivi(prog_dsp);
+DROP INDEX IF EXISTS id_coord_idx; CREATE INDEX  id_coord_idx ON t_suivi(id_coord);
+DROP INDEX IF EXISTS id_nro_idx; CREATE INDEX  id_nro_idx ON t_suivi(id_nro);
+DROP INDEX IF EXISTS com_dep_idx; CREATE INDEX com_dep_idx ON t_suivi(com_dep);
+DROP INDEX IF EXISTS travaux_idx; CREATE INDEX  travaux_idx ON t_suivi(travaux);
+DROP INDEX IF EXISTS statut_idx; CREATE INDEX  statut_idx ON t_suivi(statut);
+DROP INDEX IF EXISTS debut_trvx_idx; CREATE INDEX  debut_trvx_idx ON t_suivi(debut_trvx);
+DROP INDEX IF EXISTS envoi_moe_idx; CREATE INDEX  envoi_moe_idx ON t_suivi(envoi_moe);
+
+
+ALTER TABLE ONLY t_suivi ALTER COLUMN realisation SET DEFAULT 'MOE';
+UPDATE t_suivi
+SET realisation = 'MOE';
+
+--- Schema : dashboard
+--- Table : t_suivi
+--- Traitement : Insertion des lignes pour mettre à jour la table suivi avec numerisation
+
+
+
+INSERT INTO dashboard.t_suivi  ( 
+  id_coord, 
+  lot, 
+  cdd,
+  mission_moe,
+  id_prog, 
+  id_nro, 
+  numero,
+  insee, 
+  com_dep, 
+  statut, 
+  emprise, 
+  nom, 
+  travaux, 
+  longueur, 
+  debut_trvx, 
+  prog_dsp, 
+  moa, 
+  commentair, 
+  envoi_moe
+)
+SELECT
+  num.id_opp, 
+  num.lot, 
+  num.cdd,
+  num.phase,
+  num.id_prog, 
+  num.id_nro,  
+  doublons.numero_opp,
+  num.insee, 
+  num.com_dep, 
+  num.statut, 
+  num.emprise, 
+  num.nom, 
+  num.travaux, 
+  num.longueur, 
+  num.debut_trvx, 
+  num.prog_dsp, 
+  num.moa, 
+  num.commentair, 
+  num.envoi_moe
+FROM coordination.numerisation num
+LEFT JOIN coordination.vue_doublons_nro_all doublons on num.id_nro=doublons.nro_ref
+WHERE num.id_opp NOT IN (SELECT DISTINCT id_opp 
+                         FROM coordination.opportunite opp
+                         WHERE num.id_opp=opp.id_opp)
+
+;
+
+--- Schema : dashboard
+--- Table : t_suivi
+--- Traitement : Insertion des lignes pour mettre à jour la table suivi avec opportunite
+
+
+INSERT INTO dashboard.t_suivi  ( 
+  id_coord, 
+  lot, 
+  cdd,
+  mission_moe,
+  id_prog, 
+  id_nro,
+  numero,
+  insee, 
+  com_dep, 
+  statut, 
+  emprise, 
+  nom, 
+  travaux, 
+  longueur, 
+  debut_trvx, 
+  prog_dsp, 
+  moa, 
+  commentair, 
+  envoi_moe
+)
+SELECT
+  opp.id_opp, 
+  opp.lot, 
+  opp.cdd,
+  opp.phase,
+  opp.id_prog, 
+  opp.id_nro,  
+  doublons.numero_opp,
+  opp.insee, 
+  opp.com_dep, 
+  opp.statut, 
+  opp.emprise, 
+  opp.nom, 
+  opp.travaux, 
+  opp.longueur, 
+  opp.debut_trvx, 
+  opp.prog_dsp, 
+  opp.moa, 
+  opp.commentair, 
+  opp.envoi_moe
+FROM coordination.opportunite opp
+LEFT JOIN coordination.vue_doublons_nro_all doublons on opp.id_nro=doublons.nro_ref
+
+;
+
+--- Schema : dashboard
+--- Table : t_suivi
+--- Traitement : Trigger pour mettre à jour la table suivi avec numerisation
+
+
+CREATE OR REPLACE FUNCTION update_t_suivi() RETURNS TRIGGER AS $$
+BEGIN
+INSERT INTO dashboard.t_suivi  ( 
+  id_coord, 
+  lot, 
+  cdd,
+  mission_moe,
+  id_prog, 
+  id_nro, 
+  numero,
+  insee, 
+  com_dep, 
+  statut, 
+  emprise, 
+  nom, 
+  travaux, 
+  longueur, 
+  debut_trvx, 
+  prog_dsp, 
+  moa, 
+  commentair, 
+  envoi_moe
+)
+VALUES(
+ new.id_opp, 
+  new.lot, 
+  new.cdd,
+  new.phase,
+  new.id_prog, 
+  new.id_nro,  
+  new.numero,
+  new.insee, 
+  new.com_dep, 
+  new.statut, 
+  new.emprise, 
+  new.nom, 
+  new.travaux, 
+  new.longueur, 
+  new.debut_trvx, 
+  new.prog_dsp, 
+  new.moa, 
+  new.commentair, 
+  new.envoi_moe)
+;
+  RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+
+DROP TRIGGER IF EXISTS trg_update_t_suivi ON dashboard.t_suivi;
+DROP TRIGGER IF EXISTS trg_update_t_suivi ON coordination.numerisation;
+CREATE TRIGGER trg_update_t_suivi
+AFTER INSERT OR DELETE OR UPDATE ON coordination.numerisation 
+FOR EACH ROW
+EXECUTE PROCEDURE update_t_suivi();
+
+CREATE OR REPLACE FUNCTION delete_t_suivi() RETURNS TRIGGER AS $$
+BEGIN
+ WITH a_supprimer AS
+(
+SELECT *
+FROM dashboard.t_suivi AS num
+WHERE	num.id_coord  NOT IN  
+(SELECT DISTINCT id_opp
+FROM coordination.numerisation  opp
+WHERE id_coord=id_opp
+GROUP BY id_coord, id_opp
+))
+DELETE FROM dashboard.t_suivi a
+USING a_supprimer b
+WHERE a.id = b.id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+
+DROP TRIGGER IF EXISTS trg_delete_t_suivi ON dashboard.t_suivi;
+DROP TRIGGER IF EXISTS trg_delete_t_suivi ON coordination.numerisation;
+CREATE TRIGGER trg_delete_t_suivi
+AFTER UPDATE OR DELETE ON coordination.numerisation 
+FOR EACH ROW
+EXECUTE PROCEDURE delete_t_suivi();
+
+--- Schema : dashboard
+--- Table : t_suivi
+--- Traitement : Trigger pour mettre à jour la table suivi avec opportunite
+
+
+CREATE OR REPLACE FUNCTION update_t_suivi() RETURNS TRIGGER AS $$
+BEGIN
+INSERT INTO dashboard.t_suivi  ( 
+  id_coord, 
+  lot, 
+  cdd,
+  mission_moe,
+  id_prog, 
+  id_nro, 
+  numero,
+  insee, 
+  com_dep, 
+  statut, 
+  emprise, 
+  nom, 
+  travaux, 
+  longueur, 
+  debut_trvx, 
+  prog_dsp, 
+  moa, 
+  commentair, 
+  envoi_moe
+)
+VALUES(
+ new.id_opp, 
+  new.lot, 
+  new.cdd,
+  new.phase,
+  new.id_prog, 
+  new.id_nro,  
+  new.numero,
+  new.insee, 
+  new.com_dep, 
+  new.statut, 
+  new.emprise, 
+  new.nom, 
+  new.travaux, 
+  new.longueur, 
+  new.debut_trvx, 
+  new.prog_dsp, 
+  new.moa, 
+  new.commentair, 
+  new.envoi_moe)
+;
+  RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+
+DROP TRIGGER IF EXISTS trg_update_t_suivi ON dashboard.t_suivi;
+DROP TRIGGER IF EXISTS trg_update_t_suivi ON coordination.opportunite;
+CREATE TRIGGER trg_update_t_suivi
+AFTER INSERT OR DELETE OR UPDATE ON coordination.opportunite 
+FOR EACH ROW
+EXECUTE PROCEDURE update_t_suivi();
+
+--- Schema : dashboard
+--- Table : t_suivi
+--- Traitement : Supprimer doublons lorsque plusieurs entités ont le même id_coord 
+--- mais plusieurs mission_moe et supprimer mission_moe = 'Numerisation'
+
+CREATE OR REPLACE FUNCTION delete_duplicate_rows_t_suivi() RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  WITH a_supprimer AS
+(
+SELECT *
+FROM dashboard.t_suivi AS num
+WHERE	num.id_coord  IN 
+(SELECT DISTINCT id_coord 
+FROM dashboard.t_suivi opp
+WHERE num.mission_moe not LIKE  opp.mission_moe and num.mission_moe like 'Numerisation'
+GROUP BY id_coord, mission_moe
+HAVING num.id_coord=opp.id_coord
+))
+DELETE FROM dashboard.t_suivi a
+USING a_supprimer b
+WHERE a.id = b.id;
+  RETURN NULL;
+END;
+$$;
+
+
+DROP TRIGGER IF EXISTS trg_delete_duplicate_rows_t_suivi ON dashboard.numerisation;
+DROP TRIGGER IF EXISTS trg_delete_duplicate_rows_t_suivi ON dashboard.t_suivi;
+CREATE TRIGGER trg_delete_duplicate_rows_t_suivi
+AFTER INSERT OR UPDATE OR DELETE ON dashboard.t_suivi
+FOR EACH ROW
+EXECUTE PROCEDURE delete_duplicate_rows_t_suivi();
+
+
+
+

@@ -239,7 +239,7 @@ SELECT
    CASE WHEN a.debut_trvx IS NULL THEN 'Inconnue'::character varying ELSE a.debut_trvx END AS debut_trvx,
    a.moa,
    d.nb_suf,
-   f.longueur_max as longueur,
+   f.longueur_opp as longueur,
    CASE WHEN b.nb_chb_exists IS NULL THEN 0 ELSE b.nb_chb_exists END AS  nb_chb_exists,
    CASE WHEN g.nb_chb_a_creer IS NULL THEN 0 ELSE g.nb_chb_a_creer END AS  nb_chb_a_creer,
    CASE WHEN g.nb_chb_desserte IS NULL THEN 0 ELSE g.nb_chb_desserte END AS  nb_chb_desserte,
@@ -255,9 +255,10 @@ LEFT JOIN coordination.vue_nb_chb_a_creer g ON a.id_opp like g.id_coord
 GROUP BY 
 a.id_opp,a.nom, a.com_dep,a.emprise, a.travaux,e.prev_starr, a.cables, 
 a.typ_cable, a.prog_dsp, a.debut_trvx, a.moa, d.nb_suf, b.nb_chb_exists, 
-f.longueur_max, g.nb_chb_a_creer, g.nb_chb_desserte,g.nb_chb_transport, g.nb_chb_indef, a.statut
+f.longueur_opp, g.nb_chb_a_creer, g.nb_chb_desserte,g.nb_chb_transport, g.nb_chb_indef, a.statut
 order by id_opp DESC
 )vue;
+
 
 
 

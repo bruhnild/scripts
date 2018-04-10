@@ -410,6 +410,15 @@ SET    codcov = (CASE
     WHEN idtroncon LIKE 'R28' THEN REPLACE(code_cov, 'CH-413', 'CH-228')
     END);
 
+----- Connaitre type de caractère dans un champ
+SELECT num_deb_fr, SUBSTR(num_deb_fr, 2,1),
+    (CASE WHEN ASCII(SUBSTR(num_deb_fr, 2,1)) BETWEEN 48 AND 57 THEN 'chiffre'
+      WHEN ASCII(SUBSTR(num_deb_fr, 2,1)) BETWEEN 65 AND 90 THEN 'lettre'
+      WHEN ASCII(SUBSTR(num_deb_fr, 2,1)) BETWEEN 97 AND 122 THEN 'lettre'
+      ELSE 'autre caractère' END) AS carac
+FROM ban.t_ban_travail_arianaville
+
+
 ----- Mettre à jour table selon un champ avec un case when/else
 
 UPDATE covage.points_techniques_renommage
@@ -574,6 +583,23 @@ WHERE classement IN (
         FROM ep.diag_nro) t
         WHERE t.rnum > 1);
 
+--- Supprimer doublons lorsque plusieurs entités ont le même id_coord 
+--- mais plusieurs mission_moe et supprimer mission_moe = 'Numerisation'
+WITH a_supprimer AS
+(
+SELECT *
+FROM dashboard.t_suivi AS num
+WHERE num.id_coord  IN 
+(SELECT DISTINCT id_coord 
+FROM dashboard.t_suivi opp
+WHERE num.mission_moe not LIKE  opp.mission_moe and num.mission_moe like 'Numerisation'
+GROUP BY id_coord, mission_moe
+HAVING num.id_coord=opp.id_coord
+))
+DELETE FROM dashboard.t_suivi a
+USING a_supprimer b
+WHERE a.id = b.id
+;
 --- comparer nombre de champs dans 2 tables
 
 SELECT * FROM tbl_A WHERE champ_a_comparer_tbl_A NOT IN(
@@ -712,3 +738,13 @@ SELECT *
 
 --- Connaitre la taille de toues les bases de données
  SELECT pg_database.datname, pg_size_pretty(pg_database_size(pg_database.datname)) AS size FROM pg_database;
+
+ --- Supprimer BDD
+
+  SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+WHERE pg_stat_activity.datname = 'adn_l49'
+  AND pid <> pg_backend_pid();
+
+  -- suppression de la base de donnée depuis une autre bdd
+   drop database adn_l49;

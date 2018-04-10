@@ -1899,7 +1899,7 @@ INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
 	from routing.ST_MakePolygon_ST_ExteriorRing_postesec_pietons_5mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
+	where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
 	group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
@@ -1914,7 +1914,7 @@ INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
 	from routing.ST_MakePolygon_ST_ExteriorRing_postesec_pietons_10mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
+	where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
 	group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
@@ -1929,7 +1929,7 @@ INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
 	from routing.ST_MakePolygon_ST_ExteriorRing_postesec_pietons_20mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
+	where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
 	group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
@@ -1946,7 +1946,7 @@ INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
 	from routing.ST_MakePolygon_ST_ExteriorRing_postesec_velos_2mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
+	where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
 	group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
@@ -1961,7 +1961,7 @@ INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
 	from routing.ST_MakePolygon_ST_ExteriorRing_postesec_velos_4mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
+	where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
 	group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
@@ -1976,7 +1976,7 @@ INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
 	from routing.ST_MakePolygon_ST_ExteriorRing_postesec_velos_8mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
+	where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
 	group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
@@ -1993,7 +1993,7 @@ INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
 	from routing.ST_MakePolygon_ST_ExteriorRing_postesec_voiture_2mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
+	where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
 	group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
@@ -2008,12 +2008,11 @@ INNER JOIN
     (
     select a.st_union as geom, sum(b.surf_hab)sumPrice, nom_del_fr
 	from routing.ST_MakePolygon_ST_ExteriorRing_postesec_voiture_4mn a, batiments.osm_2018 b
-	where st_intersects(a.st_union, b.geom)
+	where st_intersects(a.st_union, b.geom) and nom_del_fr like 'CITE ETTADHAMEN' and usage like 'Particulier'
 	group by a.st_union, nom_del_fr
     ) t
     ON t.nom_del_fr = p.nom_del_fr
     ;
-
 /*
 -------------------------------------------------------------------------------------
 ETAPE 4 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES

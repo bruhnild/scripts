@@ -923,6 +923,38 @@ CREATE OR REPLACE VIEW rip2.vue_adn_nro AS
    FROM rip2.adn_nro a
    join rip2.vue_adn_znro  as b ON a.nro_ref= b.nro_ref
 
+--- Schema : coordination
+--- Table : vue_rapport_longueur
+
+CREATE OR REPLACE VIEW coordination.vue_rapport_longueur AS 
+SELECT 
+a.id_opp as id_num,
+a.longueur_max as longueur_num,
+b.id_opp as id_opp,
+b.longueur_max as longueur_opp
+from
+(
+(WITH sum AS (
+         SELECT numerisation.id_opp,
+            sum(numerisation.longueur) AS longueur_max
+           FROM coordination.numerisation
+          GROUP BY numerisation.id_opp
+        )
+ SELECT DISTINCT ON (sum.id_opp) sum.id_opp,
+    sum.longueur_max
+   FROM coordination.numerisation o,
+    sum))a left join 
+  (WITH sum AS (
+         SELECT opportunite.id_opp,
+            sum(opportunite.longueur) AS longueur_max
+           FROM coordination.opportunite
+          GROUP BY opportunite.id_opp
+        )
+ SELECT DISTINCT ON (sum.id_opp) sum.id_opp,
+    sum.longueur_max 
+   FROM coordination.opportunite o,
+    sum)b on  a.id_opp = b.id_opp
+
 
 
 
@@ -1037,6 +1069,64 @@ FROM coordination.numerisation as a
 where id_opp is not null
 group by id_opp
 ;
+
+--- Schema : coordination 
+--- Table : numerisation
+--- Traitement : Rajout numero 
+ALTER TABLE  coordination.numerisation ADD COLUMN numero varchar(3);
+UPDATE coordination.numerisation as a
+SET numero = numero_opp
+FROM coordination.vue_doublons_nro_all as b 
+WHERE a.id_nro=b.nro_ref
+;
+
+--- Schema : coordination 
+--- Table : opportunite
+--- Traitement : Rajout numero 
+ALTER TABLE  coordination.opportunite ADD COLUMN numero varchar(3);
+UPDATE coordination.opportunite as a
+SET numero = numero_opp
+FROM coordination.vue_doublons_nro_all as b 
+WHERE a.id_nro=b.nro_ref;
+
+
+--- Schema : coordination 
+--- Table : vue_doublons_nro_all
+
+ CREATE OR REPLACE  VIEW coordination.vue_doublons_nro_all as 
+ SELECT doublons_nro.nbr_doublon,
+    doublons_nro.id_nro AS nro_ref,
+  numero_opp
+   FROM ( WITH compte AS (
+                 SELECT numerisation.id_nro,
+                    numerisation.id_opp
+                   FROM coordination.numerisation
+                  GROUP BY numerisation.id_nro, numerisation.id_opp
+                  ORDER BY numerisation.id_nro
+                )
+         SELECT count(compte.id_nro) AS nbr_doublon, lpad(cast(count(compte.id_nro)+1 as varchar),3,'0') as numero_opp, 
+            compte.id_nro
+           FROM compte
+          GROUP BY compte.id_nro) doublons_nro  
+UNION ALL
+ SELECT 0 AS nbr_doublon,
+    doublons_nro.nro_ref,
+  numero_opp
+   FROM ( WITH compte AS (
+                 SELECT a.nro_ref,
+                    NULL::character varying AS id_opp
+                   FROM administratif.communes a
+                  GROUP BY a.nro_ref, NULL::character varying
+                  ORDER BY a.nro_ref
+                )
+         SELECT count(compte.nro_ref) AS nbr_doublon,lpad(cast(count(compte.nro_ref)+1 as varchar),3,'0') as numero_opp,
+            compte.nro_ref
+           FROM compte
+          GROUP BY compte.nro_ref) doublons_nro
+  WHERE NOT (doublons_nro.nro_ref::text IN ( SELECT a.id_nro
+           FROM coordination.numerisation a
+          WHERE a.id_nro IS NOT NULL))
+  ORDER BY 1 DESC;
 
 --- Schema : coordination 
 --- Table : chambres_a_creer
@@ -1176,8 +1266,30 @@ ON coordination.numerisation
 FOR EACH ROW EXECUTE PROCEDURE update_id_opp();
 
 
+--- Schema : coordination 
+--- Table : numerisation
+-- Met à jour le champ statut (A présenter ou Abandonnée en Traitée)
+---de numerisation lorsque l'entité est copiée dans opportunité
 
+CREATE OR REPLACE FUNCTION update_statut_num() RETURNS TRIGGER AS $$
+BEGIN
+--  IF NEW.url != OLD.url  THEN
+    UPDATE coordination.numerisation a
+    SET statut='Traitée'
+  FROM coordination.opportunite b 
+  WHERE a.id_opp= b.id_opp;
+--  END IF;
+--  RETURN NEW;
+  RETURN NULL;
+END;
+$$ LANGUAGE 'plpgsql';
 
+DROP TRIGGER IF EXISTS trg_update_statut_num ON coordination.numerisation;
+DROP TRIGGER IF EXISTS trg_update_statut_num ON coordination.opportunite;
+CREATE TRIGGER trg_update_statut_num
+AFTER INSERT OR UPDATE 
+ON coordination.opportunite
+FOR EACH ROW EXECUTE PROCEDURE update_statut_num();
 
 --- Schema : coordination 
 --- Table : vue_doublons_nro_all
