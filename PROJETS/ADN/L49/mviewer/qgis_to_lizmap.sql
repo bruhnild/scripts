@@ -924,26 +924,14 @@ CREATE OR REPLACE VIEW rip2.vue_adn_nro AS
    join rip2.vue_adn_znro  as b ON a.nro_ref= b.nro_ref
 
 --- Schema : coordination
---- Table : vue_rapport_longueur
+--- Table : vue_rapport_longueur_id_opp
 
-CREATE OR REPLACE VIEW coordination.vue_rapport_longueur AS 
+CREATE OR REPLACE VIEW coordination.vue_rapport_longueur_id_opp AS 
 SELECT 
-a.id_opp as id_num,
-a.longueur_max as longueur_num,
 b.id_opp as id_opp,
 b.longueur_max as longueur_opp
 from
-(
-(WITH sum AS (
-         SELECT numerisation.id_opp,
-            sum(numerisation.longueur) AS longueur_max
-           FROM coordination.numerisation
-          GROUP BY numerisation.id_opp
-        )
- SELECT DISTINCT ON (sum.id_opp) sum.id_opp,
-    sum.longueur_max
-   FROM coordination.numerisation o,
-    sum))a left join 
+
   (WITH sum AS (
          SELECT opportunite.id_opp,
             sum(opportunite.longueur) AS longueur_max
@@ -953,11 +941,9 @@ from
  SELECT DISTINCT ON (sum.id_opp) sum.id_opp,
     sum.longueur_max 
    FROM coordination.opportunite o,
-    sum)b on  a.id_opp = b.id_opp
-
-
-
-
+    sum)b 
+;
+      
 
 drop table if exists administratif.cluster_suf;
 create table administratif.cluster_suf as 

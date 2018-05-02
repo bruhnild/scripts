@@ -76,6 +76,41 @@ ALTER TABLE ONLY t_suivi ALTER COLUMN realisation SET DEFAULT 'MOE';
 UPDATE t_suivi
 SET realisation = 'MOE';
 
+
+--- Schema : dashboard
+--- Vue : v_num_opp_synthese_longueur
+--- Traitement : Calcul le nombre de ml pour les numerisations et les opportunités
+
+CREATE OR REPLACE VIEW dashboard.v_num_opp_synthese_longueur AS 
+SELECT 
+a.id_opp as id_num,
+a.longueur_max as longueur_num,
+b.id_opp as id_opp,
+b.longueur_max as longueur_opp
+from
+(
+(WITH sum AS (
+         SELECT numerisation.id_opp,
+            sum(numerisation.longueur) AS longueur_max
+           FROM coordination.numerisation
+          GROUP BY numerisation.id_opp
+        )
+ SELECT DISTINCT ON (sum.id_opp) sum.id_opp,
+    sum.longueur_max
+   FROM coordination.numerisation o,
+    sum))a left join 
+  (WITH sum AS (
+         SELECT opportunite.id_opp,
+            sum(opportunite.longueur) AS longueur_max
+           FROM coordination.opportunite
+          GROUP BY opportunite.id_opp
+        )
+ SELECT DISTINCT ON (sum.id_opp) sum.id_opp,
+    sum.longueur_max 
+   FROM coordination.opportunite o,
+    sum)b on  a.id_opp = b.id_opp
+;
+
 --- Schema : dashboard
 --- Vue : v_num_opp_synthese
 --- Traitement : Création vue synthèse (une ligne par coordination)
@@ -129,7 +164,7 @@ SELECT
   a.commentair, 
   a.envoi_moe
 FROM coordination.numerisation a
-LEFT JOIN coordination.vue_rapport_longueur f ON a.id_opp like f.id_num
+LEFT JOIN dashboard.v_num_opp_synthese_longueur f ON a.id_opp like f.id_num
 GROUP BY 
 a.id_opp,a.lot, a.cdd, a.phase, a.id_prog, a.prog_dsp, a.numero, a.id_nro, a.nom, a.statut, a.insee, a.com_dep,
 a.emprise, a.travaux, a.debut_trvx, a.moa, f.longueur_num, a.commentair, a.envoi_moe
@@ -178,7 +213,7 @@ SELECT
   a.commentair, 
   a.envoi_moe
 FROM coordination.opportunite a
-LEFT JOIN coordination.vue_rapport_longueur f ON a.id_opp like f.id_opp
+LEFT JOIN dashboard.v_num_opp_synthese_longueur f ON a.id_opp like f.id_opp
 GROUP BY 
 a.id_opp,a.lot, a.cdd, a.phase, a.id_prog, a.prog_dsp, a.numero, a.id_nro, a.nom, a.statut, a.insee, a.com_dep,
 a.emprise, a.travaux, a.debut_trvx, a.moa, f.longueur_opp, a.commentair, a.envoi_moe

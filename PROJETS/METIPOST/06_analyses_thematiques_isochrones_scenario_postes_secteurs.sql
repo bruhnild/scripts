@@ -1,7 +1,7 @@
 /*
 -------------------------------------------------------------------------------------
 ETAPE 1 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
-          POSTE SECONDAIRE : 14 JANVIER
+          POSTES SECTEUR : 14 JANVIER
 -------------------------------------------------------------------------------------
 */
 -- PIETONS
@@ -179,7 +179,7 @@ SELECT ST_MakePolygon(ST_ExteriorRing(ST_GeometryN(st_union(geom),1))) as geom F
 /*
 -------------------------------------------------------------------------------------
 ETAPE 1 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
-          POSTE SECONDAIRE : MONGI SLIM
+          POSTE SECTEUR : MONGI SLIM
 -------------------------------------------------------------------------------------
 */
 -- PIETONS
@@ -358,7 +358,7 @@ SELECT ST_MakePolygon(ST_ExteriorRing(ST_GeometryN(st_union(geom),1))) as geom F
 /*
 -------------------------------------------------------------------------------------
 ETAPE 1 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
-          POSTE SECONDAIRE : KHAIREDDINE PACHA
+          POSTE SECTEUR : KHAIREDDINE PACHA
 -------------------------------------------------------------------------------------
 */
 -- PIETONS
@@ -537,7 +537,7 @@ SELECT ST_MakePolygon(ST_ExteriorRing(ST_GeometryN(st_union(geom),1))) as geom F
 /*
 -------------------------------------------------------------------------------------
 ETAPE 1 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
-          POSTE SECONDAIRE : ABULKASSEM ECH-CHEBBI
+          POSTE SECTEUR : ABULKASSEM ECH-CHEBBI
 -------------------------------------------------------------------------------------
 */
 -- PIETONS
@@ -716,7 +716,7 @@ SELECT ST_MakePolygon(ST_ExteriorRing(ST_GeometryN(st_union(geom),1))) as geom F
 /*
 -------------------------------------------------------------------------------------
 ETAPE 1 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
-          POSTE SECONDAIRE : IBN KHALDOUN
+          POSTE SECTEUR : IBN KHALDOUN
 -------------------------------------------------------------------------------------
 */
 -- PIETONS
@@ -895,7 +895,7 @@ SELECT ST_MakePolygon(ST_ExteriorRing(ST_GeometryN(st_union(geom),1))) as geom F
 /*
 -------------------------------------------------------------------------------------
 ETAPE 1 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
-          POSTE SECONDAIRE : CITE ETTADHAMEN
+          POSTE SECTEUR : CITE ETTADHAMEN
 -------------------------------------------------------------------------------------
 */
 -- PIETONS
@@ -1075,7 +1075,7 @@ SELECT ST_MakePolygon(ST_ExteriorRing(ST_GeometryN(st_union(geom),1))) as geom F
 /*
 -------------------------------------------------------------------------------------
 ETAPE 1 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
-          POSTE SECONDAIRE : 09 AVRIL
+          POSTE SECTEUR : 09 AVRIL
 -------------------------------------------------------------------------------------
 */
 -- PIETONS
@@ -1254,7 +1254,7 @@ SELECT ST_MakePolygon(ST_ExteriorRing(ST_GeometryN(st_union(geom),1))) as geom F
 /*
 -------------------------------------------------------------------------------------
 ETAPE 1 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
-          POSTE SECONDAIRE : 18 JANVIER
+          POSTE SECTEUR : 18 JANVIER
 -------------------------------------------------------------------------------------
 */
 -- PIETONS
@@ -1432,7 +1432,7 @@ SELECT ST_MakePolygon(ST_ExteriorRing(ST_GeometryN(st_union(geom),1))) as geom F
 /*
 -------------------------------------------------------------------------------------
 ETAPE 1 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
-          POSTE SECONDAIRE : 20 MARS
+          POSTE SECTEUR : 20 MARS
 -------------------------------------------------------------------------------------
 */
 -- PIETONS
@@ -1611,7 +1611,7 @@ SELECT ST_MakePolygon(ST_ExteriorRing(ST_GeometryN(st_union(geom),1))) as geom F
 /*
 -------------------------------------------------------------------------------------
 ETAPE 2 : ANALYSES THEMATIQUES : CALCUL D'ISOCHRONES
-          POSTES SECONDAIRES UNION
+          POSTES SECTEUR UNION
 -------------------------------------------------------------------------------------
 */
 -- PIETONS

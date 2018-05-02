@@ -250,7 +250,7 @@ FROM coordination.opportunite a
 LEFT JOIN rip1.vue_chambres_adn b ON a.id_opp like b.id_opp
 LEFT JOIN administratif.vue_nb_suf_opp d ON a.id_opp like d.id_opp
 LEFT JOIN coordination.vue_rapport_prev_starr e ON a.id_opp like e.id_opp
-LEFT JOIN coordination.vue_rapport_longueur f ON a.id_opp like f.id_opp
+LEFT JOIN coordination.vue_rapport_longueur_id_opp f ON a.id_opp like f.id_opp
 LEFT JOIN coordination.vue_nb_chb_a_creer g ON a.id_opp like g.id_coord
 GROUP BY 
 a.id_opp,a.nom, a.com_dep,a.emprise, a.travaux,e.prev_starr, a.cables, 

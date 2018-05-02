@@ -1,33 +1,51 @@
 /*
- PREPARATION TABLES PG ROUTING
+-------------------------------------------------------------------------------------
+Auteur : Marine FAUCHER (METIS)
+Date de création : 05/05/2018
+Objet : Préparation de la route topologique pour isochrones et itinéraires
+Modification : Nom : ///// - Date : date_de_modif - Motif/nature : //////
+
 -------------------------------------------------------------------------------------
 */
 
+/*
+-------------------------------------------------------------------------------------
+ETAPE 1 : PREPARATION DES TABLES PG ROUTING
+-------------------------------------------------------------------------------------
+*/
+
+-- Action 1: Préparation de la base de donnée
 CREATE EXTENSION pgrouting;
 
 DROP SCHEMA IF EXISTS topology CASCADE;
 DROP SCHEMA IF EXISTS routing CASCADE;
 CREATE EXTENSION postgis_topology;
 
--- Action 3: Création du schéma topologique en 32632
+-- Action 2: Création du schéma topologique en 32632
 SELECT topology.CreateTopology('routing', 32632);
 
 UPDATE routes.osm_2018
 SET geom=ST_MakeValid(geom);
 
--- Action 6: Ajouter une colonne topologique 'topo'
+-- Action 3: Ajouter une colonne topologique 'topo'
 SELECT topology.AddTopoGeometryColumn('routing', 'routes', 'osm_2018', 'topo', 'LINESTRING');
 
--- Action 7: Convertir les lignes brisées en noeuds et arrêtes au sein de la topologie  
+-- Action 4: Convertir les lignes brisées en noeuds et arrêtes au sein de la topologie  
 UPDATE routes.osm_2018 SET topo = topology.toTopoGeom(geom, 'routing', 1, 0)
 where nom_del_fr like 'CITE ETTADHAMEN';
 
--- Enrichir notre table en rajoutant les noms et  les type de voiries.
+/*
+-------------------------------------------------------------------------------------
+ETAPE 2 : MISE A JOUR DES CHAMPS DE LA TABLE edge_data
+-------------------------------------------------------------------------------------
+*/
+
+-- Action 1: Enrichir notre table en rajoutant les noms et  les type de voiries.
 
 ALTER TABLE routing.edge_data  add COLUMN  fclass   character varying;
 ALTER TABLE routing.edge_data  add COLUMN  name  character varying;
 
--- Créer une table intermédiaire « route_edge_data » pour stocker les noms et types.
+-- Action 2: Créer une table intermédiaire « route_edge_data » pour stocker les noms et types.
 
 drop table if exists routing.route_edge_data;
 create table routing.route_edge_data as
@@ -39,14 +57,14 @@ SELECT
 FROM routing.edge_data e, routing.relation rel, routes.osm_2018 r
 WHERE e.edge_id = rel.element_id  AND rel.topogeo_id = (r.topo).id;
 
--- Mettre à jour attributs depuis la table « route_edge_data »
+-- Action 3: Mettre à jour attributs depuis la table « route_edge_data »
 
 UPDATE routing.edge_data  a 
 SET (fclass, name) = (r.fclass, r.name) 
 FROM routing.route_edge_data  r 
 WHERE a.edge_id=r.edge_id;
 
---Pour enrichir notre table en rajoutant le sens de la circulation voici la requête.
+-- Action 4: Pour enrichir notre table en rajoutant le sens de la circulation voici la requête.
 drop table if exists routing.route_edge_data;
 create table routing.route_edge_data as
 SELECT 
@@ -63,12 +81,17 @@ SET oneway = r.oneway
 FROM routing.route_edge_data  r 
 WHERE a.edge_id=r.edge_id;
 
+/*
+-------------------------------------------------------------------------------------
+ETAPE 3 : CALCUL DES TEMPS DISTANCE POUR DIFFERENTS MODES DE TRANSPORT
+-------------------------------------------------------------------------------------
+*/
 
--- Action 8: Ajout de la colonne  colonne tps_distance pour l'agorithme de plus court chemin
+-- Action 1: Ajout de la colonne  colonne tps_distance pour l'agorithme de plus court chemin
 ALTER TABLE routing.edge_data  add COLUMN tps_distance   double precision;
 UPDATE routing.edge_data a  SET tps_distance=st_length(st_transform(geom,32632))/1000;
 
---Donc on ajoute l’attribut tps_pieton dans notre table « edge_data »  
+-- Action 2: Donc on ajoute l’attribut tps_pieton dans notre table « edge_data »  
  ALTER TABLE routing.edge_data  ADD COLUMN tps_pieton   double precision; 
 
 --MAJ tps_pieton   
@@ -83,7 +106,7 @@ update routing.edge_data set tps_pieton  =tps_pieton*60;
 --MAJ restreinte tps_pieton   
 UPDATE routing.edge_data  SET tps_pieton =-1 WHERE fclass IN ('trunk','trunk_link','motorway','motorway_link','primary_link','primary');
 
---Le plus court chemin à vélo 
+-- Action 3: Le plus court chemin à vélo 
 --On ajoute l’attribut tps_velo dans notre table « edge_data »
 ALTER TABLE routing.edge_data  ADD COLUMN tps_velo double precision;
 
@@ -96,7 +119,7 @@ update routing.edge_data set tps_velo  =tps_velo*60;
 -- Restriction
 UPDATE routing.edge_data SET tps_velo  =-1 WHERE tps_velo  IS NULL ;
 
---Le plus court chemin en voiture 
+-- Action 4: Le plus court chemin en voiture 
 --Couts tps_voiture
 ALTER TABLE routing.edge_data  ADD COLUMN tps_voiture double precision;
 --MAJ tps_voiture

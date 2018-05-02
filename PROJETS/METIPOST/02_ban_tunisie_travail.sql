@@ -630,50 +630,10 @@ ETAPE 5 : ADRESSES NON TROUVEES
 -------------------------------------------------------------------------------------
 */
 
-CREATE OR REPLACE VIEW ban.v_ban_travail_adresses_non_trouvees AS 
-SELECT row_number() over() AS gid, * 
-FROM
-(WITH adresse_all AS 
-(SELECT 
- typ_voi_fr, 
- nom_voi_fr, 
- num_deb_fr, num_fin_fr, 
- cd_post_fr,
- ville_fr,
- pays_fr, 
- cd_tour_fr,
- ctr_rat_fr, 
- source, 
- dat_maj, 
- id_voie,
- concat(typ_voi_fr, ' ',nom_voi_fr,'_',ville_fr) as adresse_ban, 
- a.adresse_del as adresse_route, 
- a.geom from routes.v_delegations_multilinestring a, ban.t_ban_travail b )
-SELECT 
-typ_voi_fr, null::varchar as typ_voi_ar, 
-nom_voi_fr, null::varchar as nom_voi_ar,
-num_deb_fr::int, null::int as num_deb_ar,
-num_fin_fr::int, null::int as num_fin_ar,
-cd_post_fr, null::varchar as cd_post_ar,
-ville_fr,null::varchar as ville_ar,
-pays_fr, null::varchar as pays_ar,
-null::varchar as suffixe_fr, null::varchar as suffixe_ar, 
-null::varchar as nom_imm_fr, null::varchar as nom_imm_ar, 
-cd_tour_fr, null::varchar as cd_tour_ar,
-ctr_rat_fr, null::varchar as ctr_rat_ar,
-null::int as nb_pro_fr, null::int as nb_pro_ar, 
-null::int as nb_ind_fr, null::int as nb_ind_ar, 
-null::int as nb_tot_af, null::int as nb_tot_ar, 
-source, 
-dat_maj, 
-id_voie,
-null::varchar as geonyme, 
-geom
-FROM adresse_all as a
-where a.adresse_ban=a.adresse_route and ASCII(SUBSTR(num_deb_fr, 1, 1)) BETWEEN 48 AND 57
-group by  id_voie, adresse_route, adresse_ban, geom, typ_voi_fr, nom_voi_fr, num_deb_fr, num_fin_fr, cd_post_fr, ville_fr, pays_fr, cd_tour_fr, ctr_rat_fr, source, dat_maj
-)a
-;
+--- Schema : ban
+--- Vue : v_ban_travail_adresses_non_trouvees              
+--- Traitement : Fait le mapping entre les adresses géocodées (t_ban_repositionnement) et 
+--- les adresses de la table t_ban_travail
 
 CREATE OR REPLACE VIEW ban.v_ban_travail_adresses_non_trouvees AS 
 SELECT row_number() over() AS gid, * from
@@ -719,39 +679,46 @@ WHERE adresse NOT IN
 (SELECT adresse FROM
 (WITH adresse_t_ban_repositionnement AS
 (
+SELECT concat (typ_voi_fr, '_', nom_imm_fr, '_' , ville_fr) as adresse_imm
+FROM ban.t_ban_repositionnement AS t_ban_repositionnement)
+SELECT * FROM adresse_t_ban_repositionnement
+order by adresse_imm)b
+WHERE adresse=adresse_imm 
+GROUP BY adresse_imm
+)
+ AND adresse NOT IN  
+(SELECT adresse FROM
+(WITH adresse_t_ban_repositionnement AS
+(
 SELECT concat (typ_voi_fr, '_', nom_voi_fr, '_' , ville_fr) as adresse
 FROM ban.t_ban_repositionnement AS t_ban_repositionnement)
 SELECT * FROM adresse_t_ban_repositionnement)b
 WHERE adresse=adresse 
 GROUP BY adresse
-))a
+)
+)a
 WHERE  geom <> '';
 
-select count ( concat(typ_voi_fr, ' ',nom_voi_fr,'_',ville_fr)) as adresse_tournee
-from ban.t_ban_travail
+/*
+-------------------------------------------------------------------------------------
+ETAPE 6 : SUIVI STATISTIQUE
+-------------------------------------------------------------------------------------
+*/
+--- Schema : ban
+--- Vue : v_ban_suivi_statistiques              
+--- Traitement : Calcul le nombre d'adresses restant à géocoder
 
-select count ( concat(typ_voi_fr, ' ',nom_voi_fr,'_',ville_fr)) as adresses_tournees
-from ban.t_ban_travail
-
-select count ( concat(typ_voi_fr, ' ',nom_voi_fr,'_',ville_fr)) as adresses_tournees_non_trouvees
-from ban.v_ban_travail_adresses_non_trouvees
-
-adresses_tournees_non_trouvees*100/adresses_tournees as per_adresses_non_trouvees
-
-adresses_tournees-adresses_tournees_non_trouvees as per_adresses_trouvees as adresses_tournees_trouvees
-
-adresses_tournees_trouvees*100/adresses_tournees as per_adresses_trouvees
-
-
+CREATE OR REPLACE VIEW ban.v_ban_suivi_statistiques AS 
 WITH adr_tournees AS (
         select count ( concat(typ_voi_fr, ' ',nom_voi_fr,'_',ville_fr)) as adresses_tournees
-		from ban.t_ban_travail
+    from ban.t_ban_travail
      ), adr_tournees_non_trouvees AS (
         select count ( concat(typ_voi_fr, ' ',nom_voi_fr,'_',ville_fr)) as adresses_tournees_non_trouvees
-		from ban.v_ban_travail_adresses_non_trouvees
+    from ban.v_ban_travail_adresses_non_trouvees
      )
 SELECT adresses_tournees,
        adresses_tournees_non_trouvees,
-	   adresses_tournees_non_trouvees*100/adresses_tournees as per_adresses_non_trouvees,
-	   adresses_tournees-adresses_tournees_non_trouvees as adresses_tournees_trouvees
+     adresses_tournees_non_trouvees*100/adresses_tournees as per_adresses_non_trouvees,
+     adresses_tournees-adresses_tournees_non_trouvees as adresses_tournees_trouvees
 FROM adr_tournees, adr_tournees_non_trouvees
+;
