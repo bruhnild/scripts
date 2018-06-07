@@ -393,7 +393,15 @@ ALTER TABLE building_2d.bati_rouen_metropole_ign2015_2154 ADD COLUMN gid SERIAL 
 ALTER TABLE tr20_out.lgfourreaux
   ADD PRIMARY KEY (lgfx_id);
 
+--- Traitement : Création d'un ogc_fid (alors qu'il existe déjà une clé primaire)
 
+  ALTER TABLE pci70_edigeo_majic.geo_batiment ADD COLUMN ogc_fid integer  
+  UPDATE pci70_edigeo_majic.geo_batiment c
+    SET ogc_fid = c2.seqnum
+    FROM (SELECT c2.*, row_number() over () as seqnum
+          FROM pci70_edigeo_majic.geo_batiment c2
+         ) c2
+    WHERE c2.geo_batiment = c.geo_batiment;
 
 ----- Remplacer ',' par '-'
 
@@ -704,29 +712,6 @@ AFTER INSERT OR UPDATE OR DELETE ON coordination.opportunite
 FOR EACH ROW EXECUTE PROCEDURE update_url();
 
 
- SELECT id, ('OPP_'||pr ||'-'|| nro_ref||'-'||nbr_doublon) as id_opp
-   FROM ( WITH sequenc AS (
-   SELECT
-   a.id,
-   a.commune,
-   b.nro_ref,
-   CASE WHEN b.pr IS NULL THEN 'XX'::character varying ELSE b.pr END AS pr,
-   CASE WHEN c.nbr_doublon = 1 THEN 1 ELSE c.nbr_doublon END AS nbr_doublon
-   FROM coordination.chaussee_2018_07 as a
-   JOIN  administratif.communes as b ON a.commune = b.commune
-   JOIN coordination.vue_doublons_nro_all as c ON b.nro_ref = c.id_nro 
-                )
-         SELECT *
-         FROM sequenc
-          ) concat
-
-
-
-SELECT a.id, 'OPP_'||pr ||'-'|| nro_ref||'-'||lpad(CAST(row_number() OVER (PARTITION BY nro_ref ORDER BY a.id)AS VARCHAR), 3, '0')id_opp
-FROM coordination.chaussee_2018_07 as a
-JOIN  administratif.communes as b USING (commune)
-JOIN  coordination.vue_doublons_nro_all  as c USING (nro_ref)
-order by id_opp;
 
 --- Supprimer table récalcitrante (pid)
 SELECT *

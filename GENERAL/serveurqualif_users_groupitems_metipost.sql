@@ -1,8 +1,6 @@
 /*
 ####################################################################
-
                    GROUPE ITEMS - METIPOST
-
 ####################################################################
 */
 ---Requête de création du groupe utilisateur---
@@ -188,6 +186,3 @@ REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM fdridi;
 REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA routes FROM fdridi;
 REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA topology FROM fdridi;
 DROP USER fdridi;*/
-
-
-

@@ -923,6 +923,110 @@ CREATE OR REPLACE VIEW rip2.vue_adn_nro AS
    FROM rip2.adn_nro a
    join rip2.vue_adn_znro  as b ON a.nro_ref= b.nro_ref
 
+--- Schema : rip2
+--- Vue : vue_resopt_boitiers
+
+CREATE OR REPLACE VIEW rip2.vue_resopt_boitiers AS 
+SELECT 
+a.gid, a.id_reseau, a.id_element, a.rang_opt, a.niveau, a.support, a.ref_prod, a.usage, 
+a.cables, a.epissures, a.cout, a.id_nod_pri, a.id_nod_sup, a.geom, a.nro_ref
+FROM rip2.resopt_boitiers as a
+JOIN administratif.communes b ON st_intersects(a.geom, b.geom)
+WHERE b.opp IS NOT NULL;
+
+--- Schema : rip2
+--- Vue : vue_resopt_liens
+
+CREATE OR REPLACE VIEW rip2.vue_resopt_liens AS 
+SELECT 
+a.id_reseau, a.id_element, a.rang_opt, a.niveau, a.segment, a.support, a.nom, a.cle_ext, a.sites, 
+a.prises, a.fibres, a.fibres_p2p, a.fibres_pon, a.fibres_res, a.cables, a.longueur, a.cout, 
+a.id_nod_pri, a.id_nod_sup, a.geom, a.nro_ref, a.gid
+FROM rip2.resopt_liens as a
+JOIN administratif.communes b ON st_intersects(a.geom, b.geom)
+WHERE b.opp IS NOT NULL;
+
+--- Schema : rip2
+--- Vue : vue_resopt_liensdistribution
+
+CREATE OR REPLACE VIEW rip2.vue_resopt_liensdistribution AS 
+SELECT 
+a.id_reseau, a.id_element, a.rang_opt, a.niveau, a.segment, a.support, a.nom, a.cle_ext, a.sites, 
+a.prises, a.fibres, a.fibres_p2p, a.fibres_pon, a.fibres_res, a.cables, a.longueur, a.cout, 
+a.id_nod_pri, a.id_nod_sup, a.geom, a.nro_ref, a.gid
+FROM rip2.resopt_liensdistribution as a
+JOIN administratif.communes b ON st_intersects(a.geom, b.geom)
+WHERE b.opp IS NOT NULL;
+
+--- Schema : rip2
+--- Vue : vue_resopt_lienstransport
+
+CREATE OR REPLACE VIEW rip2.vue_resopt_lienstransport AS 
+SELECT 
+a.id_reseau, a.id_element, a.rang_opt, a.niveau, a.segment, a.support, a.nom, a.cle_ext, a.sites, 
+a.prises, a.fibres, a.fibres_p2p, a.fibres_pon, a.fibres_res, a.cables, a.longueur, a.cout, 
+a.id_nod_pri, a.id_nod_sup, a.geom, a.nro_ref, a.gid
+FROM rip2.resopt_lienstransport as a
+JOIN administratif.communes b ON st_intersects(a.geom, b.geom)
+WHERE b.opp IS NOT NULL;
+
+--- Schema : rip2
+--- Vue : vue_resopt_noeuds
+
+CREATE OR REPLACE VIEW rip2.vue_resopt_noeuds AS 
+SELECT 
+a.id_reseau, a.id_element, a.rang_opt, a.niveau, a.etat_racco, a.supp_racco, a.support, a.nom, a.cle_ext, a.sites, 
+a.prises, a.equip, a.cout, a.id_nod_pri, a.l_nod_pri, a.id_nod_sup, a.l_nod_sup, a.l_pto_min, a.l_pto_max, a.l_pto_tot, 
+a.c_noeud, a.c_reseau, a.c_prise, a.geom, a.nro_ref, a.gid
+FROM rip2.resopt_noeuds as a
+JOIN administratif.communes b ON st_intersects(a.geom, b.geom)
+WHERE b.opp IS NOT NULL;
+
+--- Schema : rip2
+--- Vue : vue_resopt_sites
+
+CREATE OR REPLACE VIEW rip2.vue_resopt_sites AS 
+SELECT 
+a.id_reseau, a.id_element, a.rang_opt, a.etat_racco, a.supp_racco, a.support, a.nom, a.cle_ext, a.prises, a.cout, 
+a.id_nod_pri, a.l_nod_pri, a.id_nod_sup, a.l_nod_sup, a.c_site, a.c_prise, a.geom, a.nro_ref, a.gid
+FROM rip2.resopt_sites as a
+JOIN administratif.communes b ON st_intersects(a.geom, b.geom)
+WHERE b.opp IS NOT NULL;
+
+--- Schema : rip2
+--- Vue : vue_resopt_sitesdesservis
+
+CREATE OR REPLACE VIEW rip2.vue_resopt_sitesdesservis AS 
+SELECT 
+a.id_reseau, a.id_element, a.rang_opt, a.etat_racco, a.supp_racco, a.support, a.nom, a.cle_ext, a.prises, a.cout, 
+a.id_nod_pri, a.l_nod_pri, a.id_nod_sup, a.l_nod_sup, a.c_site, a.c_prise, a.geom, a.nro_ref, a.gid
+FROM rip2.resopt_sitesdesservis as a
+JOIN administratif.communes b ON st_intersects(a.geom, b.geom)
+WHERE b.opp IS NOT NULL;
+
+--- Schema : rip2
+--- Vue : vue_resopt_sitesdesservis
+
+CREATE OR REPLACE VIEW rip2.vue_resopt_sitesnondesservis AS 
+SELECT 
+a.id_reseau, a.id_element, a.rang_opt, a.etat_racco, a.supp_racco, a.support, a.nom, a.cle_ext, a.prises, a.cout, 
+a.id_nod_pri, a.l_nod_pri, a.id_nod_sup, a.l_nod_sup, a.c_site, a.c_prise, a.geom, a.nro_ref, a.gid
+FROM rip2.resopt_sitesnondesservis as a
+JOIN administratif.communes b ON st_intersects(a.geom, b.geom)
+WHERE b.opp IS NOT NULL;
+ 
+--- Schema : rip2
+--- Vue : vue_resopt_zonesdesservies
+
+CREATE OR REPLACE VIEW rip2.vue_resopt_zonesdesservies AS 
+SELECT 
+a.id_reseau, a.id_element, a.rang_opt, a.niveau, a.etat_racco, a.support, a.nom, a.cle_ext, a.sites, 
+a.prises, a.equip, a.cout, a.id_nod_pri, a.l_nod_pri, a.id_nod_sup, a.l_nod_sup, a.l_pto_min, a.l_pto_max, 
+a.l_pto_tot, a.c_noeud, a.c_reseau, a.c_prise, a.geom, a.nro_ref, a.gid
+FROM rip2.resopt_zonesdesservies as a
+JOIN administratif.communes b ON st_intersects(a.geom, b.geom)
+WHERE b.opp IS NOT NULL;
+
 --- Schema : coordination
 --- Table : vue_rapport_longueur_id_opp
 
@@ -1220,7 +1324,7 @@ FOR EACH STATEMENT EXECUTE PROCEDURE update_opp();
 
 --- Schema : coordination 
 --- Table : numerisation
--- Met à jour le champ id_opp de numerisation àà la création d'entités
+-- Met à jour le champ id_opp de numerisation à la création d'entités
 CREATE OR REPLACE FUNCTION update_id_opp() RETURNS TRIGGER AS $$
 BEGIN
 
