@@ -1,0 +1,1 @@
+copy *.csv importfichier.csv

@@ -1,0 +1,5 @@
+"num_appui";"code_commune";"libelle_commune";"code_voie";"libelle_voie";"code_centre";"code_zone";"code_entite";"num_voie";"type_appui";"caract1";"caract2";"caract3";"caract4";"caract5";"type_projection";"coord_x";"coord_y"
+"0742261";"70148";"CHEMILLY";"001T";"RTE PONTCEY";"PSS";"L00";"X0";"21";"BS7";"TRN";;;;;"Lambert II Etendu";"876960.1093427544";"2300692.5848871684"
+"0742259";"70148";"CHEMILLY";"001T";"RTE PONTCEY";"PSS";"L00";"X0";"";"MC8";"PCH";"TRM";"TDL";;;"Lambert II Etendu";"877196.7743462069";"2300471.440323933"
+"0742260";"70148";"CHEMILLY";"001T";"RTE PONTCEY";"PSS";"L00";"X0";"";"MS8";"TRM";;;;;"Lambert II Etendu";"877165.803191094";"2300495.5857661343"
+"0742263";"70148";"CHEMILLY";"006T";"LD BARRAGE";"PSS";"L00";"X0";"";"MS8";"PCG";"TRM";"TRN";"TDL";;"Lambert II Etendu";"876933.4507408594";"2300902.6295673386"

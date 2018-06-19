@@ -1,0 +1,4 @@
+"num_appui";"code_commune";"libelle_commune";"code_voie";"libelle_voie";"code_centre";"code_zone";"code_entite";"num_voie";"type_appui";"caract1";"caract2";"caract3";"caract4";"caract5";"type_projection";"coord_x";"coord_y"
+"0742229";"70278";"GRATTERY";"002T";"RUE ROMAIN";"PSS";"D00";"X0";"103";"BS7";;;;;;"Lambert II Etendu";"881134.6623064831";"2303444.4171241866"
+"0742227";"70278";"GRATTERY";"007T";"LD RUZ VELLEMOZ";"PSS";"D00";"X0";"";"BS8";"PRT";"TDL";"PKO";;;"Lambert II Etendu";"881169.1016701609";"2304627.2578721917"
+"0742228";"70278";"GRATTERY";"005T";"RUE VIGNETTES";"PSS";"F00";"X0";"";"MS8";"TRN";;;;;"Lambert II Etendu";"880941.6822350489";"2303460.2654129965"

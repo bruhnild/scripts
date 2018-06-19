@@ -1,0 +1,17 @@
+chambre_a;type_chb_a;implant_a;chambre_b;type_chb_b;implant_b;id_cable;composition;type_reseau;longueur;proprietaire;percement_a;percement_b;diam_alveole;occup_alv;perc_occup;classement
+137;D4;C;139;OHN;C;84;4Ø45;;88;Orange;Non;Non;-;-;-;12
+139;OHN;C;137;D4;C;84;4Ø45;;88;Orange;Non;Non;-;-;-;15
+136;D4;C;137;D4;C;1163;8Ø77/80;;152;Orange;Non;Non;-;-;-;3
+179;OHN;T;573;K3C;C;1329;5Ø77/80;;6;Orange;Non;Non;-;-;-;18
+136;D4;C;139;OHN;C;1977;4Ø45;;69;Orange;Non;Non;-;-;-;5
+139;OHN;C;556;OHN;C;1983;1Ø100;;17;Orange;Non;Non;-;-;-;21
+137;D4;C;138;D4;C;2071;8Ø77/80;;203;Orange;Non;Non;-;-;-;24
+137;D4;C;140;OHN;C;2073;4Ø45;;17;Orange;Non;Non;-;-;-;27
+136;D4;C;179;OHN;T;2151;8Ø77/80;;149;Orange;Non;Non;-;-;-;7
+136;D4;C;181;OHN;C;2161;4Ø45;;47;Orange;Non;Non;-;-;-;9
+181;OHN;C;179;OHN;T;2162;4Ø45;;102;Orange;Non;Non;-;-;-;30
+179;OHN;T;181;OHN;C;2162;4Ø45;;102;Orange;Non;Non;-;-;-;33
+179;OHN;T;575;D3;C;2250;16Ø77/80+4Ø45;;98;Orange;Non;Non;-;-;-;36
+179;OHN;T;182;OHN;C;2251;2Ø45;;34;Orange;Non;Non;-;-;-;39
+179;OHN;T;618;D4;C;3066;8Ø77/80+4Ø45;;60;Orange;Non;Non;-;-;-;42
+560;A4;T;136;D4;C;3079;4Ø45;;46;Orange;Oui;Non;-;-;-;1
