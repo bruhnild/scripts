@@ -1,3 +1,4 @@
+
 /*
 ####################################################################
 
@@ -5,6 +6,7 @@
 
 ####################################################################
 */
+/*
 ---Requête de création du groupe utilisateur---
 CREATE ROLE group_items_hsn WITH
   NOLOGIN
@@ -15,6 +17,7 @@ CREATE ROLE group_items_hsn WITH
   NOREPLICATION
   CONNECTION LIMIT -1;
 
+
 ---Requête de création des utilisateurs---
 CREATE USER rtlili WITH LOGIN ENCRYPTED PASSWORD '74aXixY5';
 GRANT rtlili TO group_items_hsn;
@@ -22,6 +25,7 @@ CREATE USER sjrad WITH LOGIN ENCRYPTED PASSWORD 'Qdbk425J';
 GRANT sjrad TO group_items_hsn;
 CREATE USER feten WITH LOGIN ENCRYPTED PASSWORD 'zaVmR436';
 GRANT feten TO group_items_hsn;
+*/
 --- Requete de création des droits associés
 
 /*Autorise l'utilisateur à se connecter à la base indiquée*/
@@ -44,6 +48,9 @@ GRANT SELECT ON ALL TABLES IN SCHEMA reseau_hsn TO rtlili;
 GRANT SELECT ON ALL TABLES IN SCHEMA enedis TO rtlili;
 GRANT SELECT ON ALL TABLES IN SCHEMA zone_abf TO rtlili;
 GRANT SELECT ON ALL TABLES IN SCHEMA zone_azi TO rtlili;
+GRANT SELECT ON ALL TABLES IN SCHEMA osm TO rtlili;
+GRANT SELECT ON ALL TABLES IN SCHEMA la_poste TO rtlili; 
+GRANT SELECT ON ALL TABLES IN SCHEMA pci70_majic_analyses TO rtlili;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA ban TO rtlili;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA psd_orange TO rtlili;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA rbal TO rtlili;
@@ -78,6 +85,9 @@ GRANT SELECT ON ALL TABLES IN SCHEMA reseau_hsn TO sjrad;
 GRANT SELECT ON ALL TABLES IN SCHEMA enedis TO sjrad;
 GRANT SELECT ON ALL TABLES IN SCHEMA zone_abf TO sjrad;
 GRANT SELECT ON ALL TABLES IN SCHEMA zone_azi TO sjrad;
+GRANT SELECT ON ALL TABLES IN SCHEMA osm TO sjrad;
+GRANT SELECT ON ALL TABLES IN SCHEMA la_poste TO sjrad; 
+GRANT SELECT ON ALL TABLES IN SCHEMA pci70_majic_analyses TO sjrad;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA ban TO sjrad;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA psd_orange TO sjrad;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA rbal TO sjrad;
@@ -112,6 +122,9 @@ GRANT SELECT ON ALL TABLES IN SCHEMA reseau_hsn TO feten;
 GRANT SELECT ON ALL TABLES IN SCHEMA enedis TO feten;
 GRANT SELECT ON ALL TABLES IN SCHEMA zone_abf TO feten;
 GRANT SELECT ON ALL TABLES IN SCHEMA zone_azi TO feten;
+GRANT SELECT ON ALL TABLES IN SCHEMA osm TO feten;
+GRANT SELECT ON ALL TABLES IN SCHEMA la_poste TO feten; 
+GRANT SELECT ON ALL TABLES IN SCHEMA pci70_majic_analyses TO feten;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA ban TO feten;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA psd_orange TO feten;
 GRANT INSERT,SELECT,UPDATE,DELETE ON ALL TABLES IN SCHEMA rbal TO feten;
@@ -176,6 +189,10 @@ GRANT USAGE ON SCHEMA reseau_hsn TO rtlili;
 GRANT USAGE ON SCHEMA enedis TO rtlili;
 GRANT USAGE ON SCHEMA zone_azi TO rtlili;
 GRANT USAGE ON SCHEMA zone_abf TO rtlili;
+GRANT USAGE ON SCHEMA osm TO rtlili;
+GRANT USAGE ON SCHEMA la_poste TO rtlili;
+GRANT USAGE ON SCHEMA pci70_majic_analyses TO rtlili;
+
 
 GRANT USAGE ON SCHEMA ban TO sjrad;
 GRANT USAGE ON SCHEMA pci70_edigeo_majic TO sjrad;
@@ -191,6 +208,9 @@ GRANT USAGE ON SCHEMA reseau_hsn TO sjrad;
 GRANT USAGE ON SCHEMA enedis TO sjrad;
 GRANT USAGE ON SCHEMA zone_azi TO sjrad;
 GRANT USAGE ON SCHEMA zone_abf TO sjrad;
+GRANT USAGE ON SCHEMA osm TO sjrad;
+GRANT USAGE ON SCHEMA la_poste TO sjrad;
+GRANT USAGE ON SCHEMA pci70_majic_analyses TO sjrad;
 
 
 GRANT USAGE ON SCHEMA ban TO feten;
@@ -207,6 +227,9 @@ GRANT USAGE ON SCHEMA reseau_hsn TO feten;
 GRANT USAGE ON SCHEMA enedis TO feten;
 GRANT USAGE ON SCHEMA zone_azi TO feten;
 GRANT USAGE ON SCHEMA zone_abf TO feten;
+GRANT USAGE ON SCHEMA osm TO feten;
+GRANT USAGE ON SCHEMA la_poste TO feten;
+GRANT USAGE ON SCHEMA pci70_majic_analyses TO feten;
 
 /*Permission de création de séquences*/
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA ban TO rtlili;
@@ -229,7 +252,8 @@ GRANT USAGE ON ALL SEQUENCES IN SCHEMA gracethd_metis TO sjrad;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA gracethd_metis TO feten;
 
 
-/*Suppression des users
+/*
+Suppression des users
 REVOKE ALL ON DATABASE metipost FROM rtlili;
 REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA administratif FROM rtlili;
 REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA analyses FROM rtlili;
@@ -272,5 +296,20 @@ REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA zone_azi FROM feten;
 REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA zone_abf FROM feten;
 
 DROP USER fdridi;
+
+
+
+$func$  LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_update_nom_pro ON rbal.t_adresse;
+DROP TRIGGER IF EXISTS trg_update_nom_pro ON rbal.v_bal_hsn_point_2154_ftth_ftte ;
+CREATE TRIGGER trg_update_nom_pro
+AFTER INSERT OR UPDATE OF 
+geom 
+ON rbal.t_adresse
+FOR EACH ROW 
+EXECUTE PROCEDURE fn_update_nom_pro();
+
+
 
 
