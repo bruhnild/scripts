@@ -56,7 +56,7 @@ WITH voie_parcelle AS
 
 --- Schema : pci70_majic_analyses
 --- Vue : batiment_parcelle_hsn_polygon_2154
---- Traitement : Positionne un batiment (surface max) par parcelle
+--- Traitement : Nom de voie et fantoir au batiment
 
 DROP TABLE IF EXISTS pci70_majic_analyses.batiment_parcelle_hsn_polygon_2154;
 CREATE TABLE pci70_majic_analyses.batiment_parcelle_hsn_polygon_2154 as 
@@ -79,10 +79,16 @@ voie_parcelle.ccodep,
 voie_parcelle.ccocom, 
 voie_parcelle.ccoriv, 
 voie_parcelle.clerivili, 
-voie_parcelle.natvoi, 
-voie_parcelle.libvoi, 
+concat (voie_parcelle.natvoi,' ', voie_parcelle.libvoi ) as ad_nomvoie,
+voie_parcelle.libvoi,
+voie_parcelle.natvoi,
 voie_parcelle.codvoi, 
-voie_parcelle.typvoi,
+(CASE WHEN voie_parcelle.typvoi LIKE '1' THEN 'voie'
+    WHEN voie_parcelle.typvoi LIKE '2' THEN 'ensemble immobilier'
+    WHEN voie_parcelle.typvoi LIKE '3' THEN 'lieu-dit'
+    WHEN voie_parcelle.typvoi LIKE '4' THEN 'pseudo-voie'
+    WHEN voie_parcelle.typvoi LIKE '5' THEN 'voie provisoire'
+    END) as typvoi,
 bati_parcelle_geom.geo_dur, 
 bati_parcelle_geom.geom 
 FROM bati_parcelle
@@ -97,6 +103,7 @@ LEFT JOIN pci70_edigeo_majic.geo_batiment c ON b.geo_batiment=c.geo_batiment)
 SELECT * FROM bati_parcelle_geom)a)bati_parcelle_geom ON bati_parcelle.geo_parcelle=bati_parcelle_geom.geo_parcelle 
 INNER JOIN pci70_majic_analyses.voie_parcelle_hsn_polygon_2154 AS  voie_parcelle ON voie_parcelle.parcelle=bati_parcelle.geo_parcelle;
 
+CREATE INDEX batiment_parcelle_hsn_polygon_2154_gix ON pci70_majic_analyses.batiment_parcelle_hsn_polygon_2154 USING GIST (geom);
 --- Schema : pci70_majic_analyses
 --- Vue : numvoie_parcelle_hsn_point_2154
 --- Traitement : Fais le lien entre les numéros de voie et les numeros de parcelles

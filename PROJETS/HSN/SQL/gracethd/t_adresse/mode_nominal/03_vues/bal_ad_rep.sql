@@ -1,0 +1,107 @@
+CREATE OR REPLACE VIEW rbal.v_bal_ad_rep AS
+
+SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
+FROM
+------------------------------------------------------
+-- Tout ce qui n'a pas de ad_rep
+(
+SELECT 
+ hp.ad_code,
+ NULL::varchar as ad_rep
+FROM
+ rbal.bal_hsn_point_2154 as hp
+WHERE
+ hp.ad_code NOT IN 
+
+(SELECT ad_code FROM 
+(WITH bal_ad_rep AS 
+(SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
+FROM
+-- ad_rep (bal)
+(
+SELECT 
+  hp.ad_code,
+  (CASE WHEN ad_rep LIKE 'B' OR ad_rep LIKE 'bis' OR ad_rep LIKE 'Bis' OR ad_rep LIKE 'BIS' THEN 'B' END)::varchar AS ad_rep
+FROM
+  rbal.bal_hsn_point_2154 as hp
+WHERE
+  hp.ad_code NOT IN 
+
+(SELECT DISTINCT ON (ad_code) ad_code
+FROM
+(
+WITH ad_rep_ban AS
+(SELECT 
+	DISTINCT ON (ad_code) a.ad_code,
+	ad_ban_id, 
+ 	rep
+FROM rbal.bal_hsn_point_2154 a, ban.hsn_point_2154 b
+WHERE a.ad_ban_id=b.id)
+SELECT ad_code, ad_ban_id, rep FROM ad_rep_ban
+WHERE ad_ban_id IS NOT NULL)a) 
+AND ad_numero IS NOT NULL
+
+UNION ALL
+-- ad_rep (ban)
+(SELECT DISTINCT ON (ad_code) ad_code, rep
+FROM
+(
+WITH ad_rep_ban AS
+(SELECT 
+	DISTINCT ON (ad_code) a.ad_code,
+	ad_ban_id, 
+ 	rep
+FROM rbal.bal_hsn_point_2154 a, ban.hsn_point_2154 b
+WHERE a.ad_ban_id=b.id)
+SELECT ad_code, ad_ban_id, rep FROM ad_rep_ban
+WHERE ad_rep_ban IS NOT NULL)a)) a
+WHERE ad_rep IS NOT NULL )
+SELECT * FROM bal_ad_rep)a)
+
+UNION ALL 
+---------------------------------------
+-- Tout ce qui a un ad_rep
+SELECT ad_code, ad_rep FROM 
+(WITH bal_ad_rep AS 
+(SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
+FROM
+-- ad_rep (bal)
+(
+SELECT 
+  hp.ad_code,
+  (CASE WHEN ad_rep LIKE 'B' OR ad_rep LIKE 'bis' OR ad_rep LIKE 'Bis' OR ad_rep LIKE 'BIS' THEN 'B' END)::varchar AS ad_rep
+FROM
+  rbal.bal_hsn_point_2154 as hp
+WHERE
+  hp.ad_code NOT IN 
+
+(SELECT DISTINCT ON (ad_code) ad_code
+FROM
+(
+WITH ad_rep_ban AS
+(SELECT 
+	DISTINCT ON (ad_code) a.ad_code,
+	ad_ban_id, 
+ 	rep
+FROM rbal.bal_hsn_point_2154 a, ban.hsn_point_2154 b
+WHERE a.ad_ban_id=b.id)
+SELECT ad_code, ad_ban_id, rep FROM ad_rep_ban
+WHERE ad_ban_id IS NOT NULL)a) 
+AND ad_numero IS NOT NULL
+
+UNION ALL
+-- ad_rep (ban)
+(SELECT DISTINCT ON (ad_code) ad_code, rep
+FROM
+(
+WITH ad_rep_ban AS
+(SELECT 
+	DISTINCT ON (ad_code) a.ad_code,
+	ad_ban_id, 
+ 	rep
+FROM rbal.bal_hsn_point_2154 a, ban.hsn_point_2154 b
+WHERE a.ad_ban_id=b.id)
+SELECT ad_code, ad_ban_id, rep FROM ad_rep_ban
+WHERE ad_rep_ban IS NOT NULL)a)) a
+WHERE ad_rep IS NOT NULL )
+SELECT * FROM bal_ad_rep)a)a

@@ -1,27 +1,9 @@
---- Schema : rbal
---- Vue : v_bal_hsn_point_2154
-
-CREATE OR REPLACE VIEW rbal.v_bal_hsn_point_2154 AS
-SELECT ad_numero, ad_rep, ad_nombat, ad_racc, ad_comment, ad_nblhab, ad_nblpro, 
-construction, destruction, type_pro1, nom_pro1, type_pro2, nom_pro2, type_pro3, nom_pro3, 
-type_pro4, nom_pro4, type_pro5, nom_pro5, type_pro6, nom_pro6, type_pro7, nom_pro7, type_pro8, nom_pro8, 
-type_pro9, nom_pro9, type_pro10, nom_pro10, ad_creadat, ad_code, ad_ban_id, geom
-FROM rbal.bal_hsn_point_2154;
-
-
---- Schema : psd_orange
---- Vue : v_tx_match_bal_ban
---- Traitement : Vue qui contient le pourcentage de correspondance bal/ban dans la table t_adresse
-
-CREATE OR REPLACE VIEW rbal.v_tx_match_bal_ban AS
-SELECT count(ad_ban_id)*100/ count(ad_code) as tx_match_bal_ban
-FROM rbal.t_adresse;
 
 --- Schema : rbal
---- Vue : v_bal_hsn_point_2154_out
+--- Vue : v_ctrl_bal_out_batiment
 --- Traitement : Vue qui contient toutes les bal en dehors des batiments (nb :référentiel cadastre edigeo, manque des communes)
 
-CREATE OR REPLACE VIEW rbal.v_bal_hsn_point_2154_out AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_out_batiment AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, * 
 FROM(
 SELECT 
@@ -42,52 +24,12 @@ WHERE
   ) )a
 ;
 
---- Schema : rbal
---- Vue : v_bal_snap_in_bat
---- Traitement : Vue qui snap toutes les bals (sauf celles en doublon par bati) dans chaque batiment
-
-CREATE OR REPLACE VIEW rbal.v_bal_snap_in_bat AS
-SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, * 
-FROM(
-SELECT 
-ST_SNAP(a.geom, ST_POINTONSURFACE(b.geom),10) as geom, geo_batiment, ad_code
-FROM rbal.bal_hsn_point_2154 a, pci70_edigeo_majic.geo_batiment b
-WHERE ST_CONTAINS (b.geom, a.geom) AND  b.geo_batiment  IN 
-
-
-(SELECT geo_batiment FROM 
-(WITH geo_batiment AS
-((SELECT 
-  hp.geo_batiment,
-  hp.geom
-FROM
-  pci70_edigeo_majic.geo_batiment as hp
-WHERE
-  hp.geo_batiment NOT IN 
-  
-
-(SELECT geo_batiment FROM
-(WITH nb_ad_code_batiment AS
-(
-    SELECT 
-      h.ad_code,
-    p.geo_batiment
-    FROM 
-      pci70_edigeo_majic.geo_batiment as p,
-      rbal.bal_hsn_point_2154 as h
-    WHERE 
-      ST_Intersects(h.geom,p.geom))
-SELECT   COUNT(geo_batiment) AS nbr_doublon, geo_batiment
-FROM     nb_ad_code_batiment
-GROUP BY geo_batiment
-HAVING   COUNT(*) > 1)a)))
-SELECT * FROM geo_batiment)a))a;
 
 --- Schema : rbal
---- Vue : v_bal_liaison_out
+--- Vue : v_ctrl_bal_out_liaison
 --- Traitement : Vue qui contient toutes les bal sans liaison
 
-CREATE OR REPLACE VIEW rbal.v_bal_liaison_out AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_out_liaison AS
 WITH bal_liaison_out AS
 (
 SELECT 
@@ -112,10 +54,10 @@ FROM bal_liaison_out
 WHERE ad_nblhab >0 OR ad_nblpro > 0;
 
 --- Schema : rbal
---- Vue : v_bal_liaison_out
+--- Vue : v_ctrl_bal_out_liaison_voie
 --- Traitement : Vue qui contient toutes les bal sans liaison voie
 
-CREATE OR REPLACE VIEW rbal.v_bal_liaison_voie_out AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_out_liaison_voie AS
 WITH bal_liaison_voie_out AS
 (
 SELECT 
@@ -140,10 +82,10 @@ FROM bal_liaison_voie_out
 WHERE ad_nblhab >0 OR ad_nblpro > 0;
 
 --- Schema : rbal
---- Vue : v_bal_racco_out
+--- Vue : v_ctrl_bal_out_racco
 --- Traitement : Vue qui contient toutes les bal sans racco
 
-CREATE OR REPLACE VIEW rbal.v_bal_racco_out  AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_out_racco  AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
 (
@@ -164,10 +106,25 @@ WHERE
 
 
 --- Schema : rbal
---- Vue : v_geo_batiment_dur_out
+--- Vue : v_ctrl_bal_out_ad_racc
+--- Traitement : Vue qui contient toutes les BAL sans ad_racc (sauf pour les supprimés)
+
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_out_ad_racc AS
+SELECT ad_numero, ad_rep, ad_nombat, ad_racc, ad_comment, ad_nblhab, ad_nblpro, construction, destruction, 
+type_pro1, nom_pro1, type_pro2, nom_pro2, type_pro3, nom_pro3, type_pro4, nom_pro4, type_pro5, nom_pro5, 
+type_pro6, nom_pro6, type_pro7, nom_pro7, type_pro8, nom_pro8, type_pro9, nom_pro9, type_pro10, nom_pro10, 
+ad_creadat, ad_ban_id, geom, ad_code
+FROM rbal.bal_hsn_point_2154
+WHERE ad_racc IS NULL AND destruction NOT LIKE 'Supprimé' AND ad_nblhab > 0 
+OR ad_racc IS NULL AND destruction NOT LIKE 'Supprimé' AND ad_nblpro > 0;
+
+
+--- Schema : rbal
+--- Vue : v_ctrl_batimentdur_out_bal
 --- Traitement : Vue qui contient toutes les batis "durs" qui n'ont pas de bal
 
-CREATE OR REPLACE VIEW rbal.v_geo_batiment_dur_out AS
+
+CREATE OR REPLACE VIEW rbal.v_ctrl_batimentdur_out_bal AS
 SELECT ROW_NUMBER() OVER(ORDER BY geo_batiment) gid, * 
 FROM(
 SELECT 
@@ -189,11 +146,12 @@ WHERE
   ) AND geo_dur = '01')a
 ;
 
+
 --- Schema : rbal
---- Vue : v_geo_batiment_dur_out
+--- Vue : v_ctrl_bal_out_id_ban
 --- Traitement : Vue qui contient toutes bal sans id_ban
 
-CREATE OR REPLACE VIEW rbal.v_bal_id_ban_out AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_out_id_ban AS
 SELECT 
   hp.ad_code,
   hp.geom
@@ -217,12 +175,13 @@ WITH bal_liaison AS
       WHERE ST_DWithin(b.geom, a.geom, 0.1))
   SELECT ad_code, liaison_id, id_ban,geom  FROM bal_liaison WHERE id_ban IS NOT NULL)a);
   
+  
 
 --- Schema : rbal
---- Vue : v_geo_batiment_dur_out
+--- Vue : v_ctrl_bal_idbanout_idlocauxin
 --- Traitement : Vue qui contient toutes bal sans id_ban et avec id_locaux
 
-CREATE OR REPLACE VIEW rbal.v_bal_idbanout_idlocauxin AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_idbanout_idlocauxin AS
 SELECT 
   hp.ad_code,
   hp.geom,
@@ -268,15 +227,15 @@ WITH bal_liaison AS
   
 
 --- Schema : rbal
---- Vue : v_geo_batiment_dur_out
+--- Vue : v_ctrl_bal_idbanout_idlocauxin_voie_numero
 --- Traitement : Vue qui contient tous les locaux qui seront utilisés pour remplir les champs ad_numero et ad_nomvoie 
 
 
-CREATE OR REPLACE VIEW rbal.v_bal_idbanout_idlocauxin_voie AS 
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_idbanout_idlocauxin_voie_numero AS 
 SELECT 
  hpa.geom,
  hpa.id,
- hpa."n°_dans_la",
+ hpa.numero,
  hpa.voie
  
 FROM
@@ -326,30 +285,11 @@ WITH bal_liaison AS
   SELECT ad_code, liaison_id, id_locaux,geom  FROM bal_liaison WHERE id_locaux IS NOT NULL)a));
 
 --- Schema : rbal
---- Vue : v_bal_id_ban
+--- Vue : v_ctrl_bal_id_ban
 --- Traitement : Vue qui contient pour chaque bal son id_ban (via liaison). Voir le champ nbr_doublon_ban pour les doublons
 
 
-CREATE OR REPLACE VIEW rbal.v_bal_id_ban_ref AS
-SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
-FROM
-(SELECT ad_code, liaison_id, id_ban,geom
-FROM
-(
-WITH bal_liaison AS
-(
-    SELECT 
-    a.ad_code,
-    b.liaison_id,
-    b.id_ban,
-    a.geom      
-    FROM   
-      rbal.bal_hsn_point_2154 as a, rbal.liaison_hsn_linestring_2154 as b
-      WHERE ST_DWithin(b.geom, a.geom, 0.1))
-  SELECT ad_code, liaison_id, id_ban,geom  FROM bal_liaison WHERE id_ban IS NOT NULL)a)a;
-  
-
-CREATE OR REPLACE VIEW rbal.v_bal_id_ban AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_id_ban AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
 (SELECT ad_code, liaison_id, id_ban,nbr_doublon_ban,geom
@@ -365,11 +305,10 @@ WITH bal_liaison AS
     FROM   
       rbal.bal_hsn_point_2154 as a, rbal.liaison_hsn_linestring_2154 as b
       WHERE ST_DWithin(b.geom, a.geom, 0.1))
-  SELECT bal_liaison.ad_code, liaison_id, id_ban,nbr_doublon_ban, geom  FROM bal_liaison 
+    SELECT bal_liaison.ad_code, liaison_id, id_ban,nbr_doublon_ban, geom  FROM bal_liaison 
   
  
- LEFT JOIN
-  
+LEFT JOIN
   
 (SELECT ad_code, nbr_doublon_ban
 FROM
@@ -377,40 +316,37 @@ FROM
   WITH nbr_doublon_ban AS
   
     (SELECT COUNT(ad_code) AS nbr_doublon_ban, ad_code 
-    FROM rbal.v_bal_id_ban_ref
-    GROUP BY ad_code
-    HAVING   COUNT(*) > 1
-  ORDER BY nbr_doublon_ban)
-  SELECT * FROM nbr_doublon_ban)a)nbr_doublon_ban ON nbr_doublon_ban.ad_code=bal_liaison.ad_code
-  WHERE id_ban IS NOT NULL
-  ORDER BY nbr_doublon_ban)a)a
-  ORDER BY nbr_doublon_ban;
-  
-  
---- Schema : rbal
---- Vue : v_bal_id_ban
---- Traitement : Vue qui contient pour chaque bal son id_locaux (via liaison). Voir le champ nbr_doublon_locaux pour les doublons
-
-CREATE OR REPLACE VIEW rbal.v_bal_id_locaux_ref AS
-SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
-FROM
-(SELECT ad_code, liaison_id, id_locaux,geom
-FROM
-(
-WITH bal_liaison AS
-(
+     FROM 
+  (SELECT ad_code, liaison_id, id_ban,geom
+  FROM
+  (
+  WITH bal_liaison AS
+  (
     SELECT 
     a.ad_code,
     b.liaison_id,
-    b.id_locaux,
+    b.id_ban,
     a.geom      
     FROM   
-      rbal.bal_hsn_point_2154 as a, rbal.liaison_hsn_linestring_2154 as b
-      WHERE ST_DWithin(b.geom, a.geom, 0.1))
-  SELECT ad_code, liaison_id, id_locaux,geom  FROM bal_liaison WHERE id_locaux IS NOT NULL)a)a;
+    rbal.bal_hsn_point_2154 as a, rbal.liaison_hsn_linestring_2154 as b
+    WHERE ST_DWithin(b.geom, a.geom, 0.1))
+  SELECT ad_code, liaison_id, id_ban,geom  FROM bal_liaison WHERE id_ban IS NOT NULL)a)a
+  GROUP BY ad_code
+  HAVING   COUNT(*) > 1
+  ORDER BY nbr_doublon_ban)
+SELECT * FROM nbr_doublon_ban)a)nbr_doublon_ban ON nbr_doublon_ban.ad_code=bal_liaison.ad_code
+WHERE id_ban IS NOT NULL
+ORDER BY nbr_doublon_ban)a)a
+ORDER BY nbr_doublon_ban;
   
+  
+--- Schema : rbal
+--- Vue : v_ctrl_bal_id_locaux
+--- Traitement : Vue qui contient pour chaque bal son id_locaux (via liaison). Voir le champ nbr_doublon_locaux pour les doublons
 
-CREATE OR REPLACE VIEW rbal.v_bal_id_locaux AS
+
+
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_id_locaux AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
 (SELECT ad_code, liaison_id, id_locaux,nbr_doublon_locaux,geom
@@ -438,69 +374,82 @@ FROM
   WITH nbr_doublon_locaux AS
   
     (SELECT COUNT(ad_code) AS nbr_doublon_locaux, ad_code 
-    FROM rbal.v_bal_id_locaux_ref
-    GROUP BY ad_code
-    HAVING   COUNT(*) > 1
+    FROM (SELECT ad_code, liaison_id, id_locaux,geom
+  FROM
+    (
+    WITH bal_liaison AS
+    (
+    SELECT 
+    a.ad_code,
+    b.liaison_id,
+    b.id_locaux,
+    a.geom      
+    FROM   
+    rbal.bal_hsn_point_2154 as a, rbal.liaison_hsn_linestring_2154 as b
+    WHERE ST_DWithin(b.geom, a.geom, 0.1))
+  SELECT ad_code, liaison_id, id_locaux,geom  FROM bal_liaison WHERE id_locaux IS NOT NULL)a)a
+  GROUP BY ad_code
+  HAVING   COUNT(*) > 1
   ORDER BY nbr_doublon_locaux)
-  SELECT * FROM nbr_doublon_locaux)a)nbr_doublon_locaux ON nbr_doublon_locaux.ad_code=bal_liaison.ad_code
-  WHERE id_locaux IS NOT NULL
-  ORDER BY nbr_doublon_locaux)a)a
-  ORDER BY nbr_doublon_locaux;
+SELECT * FROM nbr_doublon_locaux)a)nbr_doublon_locaux ON nbr_doublon_locaux.ad_code=bal_liaison.ad_code
+WHERE id_locaux IS NOT NULL
+ORDER BY nbr_doublon_locaux)a)a
+ORDER BY nbr_doublon_locaux;
   
 
 --- Schema : rbal
---- Vue : v_bal_hsn_point_2154_nb_prises
---- Traitement : Vue qui contient pour pour chaque type_pro de bal le nombre de ftth/ftte correspondant
+--- Vue : v_ctrl_bal_nb_prises
+--- Traitement : Vue qui contient pour pour chaque type_pro/nom_pro de bal le nombre de ftth/ftte correspondant
 
 
-CREATE OR REPLACE VIEW rbal.v_bal_hsn_point_2154_nb_prises AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_nb_prises AS
 WITH nb_prises AS
-(SELECT DISTINCT ON (ad_code) ad_code, type_pro1 AS code_pro, type_pro, nb_ftth, nb_ftte
+(SELECT DISTINCT ON (ad_code) ad_code, type_pro1 AS code_pro, nom_pro1 AS nom_pro, type_pro, nb_ftth, nb_ftte
 FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro1=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
 UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro2 AS code_pro, type_pro, nb_ftth, nb_ftte
+SELECT DISTINCT ON (ad_code) ad_code, type_pro2 AS code_pro, nom_pro2 AS nom_pro, type_pro, nb_ftth, nb_ftte
 FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro2=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
 UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro3 AS code_pro, type_pro, nb_ftth, nb_ftte
+SELECT DISTINCT ON (ad_code) ad_code, type_pro3 AS code_pro, nom_pro3 AS nom_pro,type_pro, nb_ftth, nb_ftte
 FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro3=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
 UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro4 AS code_pro, type_pro, nb_ftth, nb_ftte
+SELECT DISTINCT ON (ad_code) ad_code, type_pro4 AS code_pro, nom_pro4 AS nom_pro,type_pro, nb_ftth, nb_ftte
 FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro4=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
 UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro5 AS code_pro, type_pro, nb_ftth, nb_ftte
+SELECT DISTINCT ON (ad_code) ad_code, type_pro5 AS code_pro, nom_pro5 AS nom_pro,type_pro, nb_ftth, nb_ftte
 FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro5=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
 UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro6 AS code_pro, type_pro, nb_ftth, nb_ftte
+SELECT DISTINCT ON (ad_code) ad_code, type_pro6 AS code_pro, nom_pro6 AS nom_pro,type_pro, nb_ftth, nb_ftte
 FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro6=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
 UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro7 AS code_pro, type_pro, nb_ftth, nb_ftte
+SELECT DISTINCT ON (ad_code) ad_code, type_pro7 AS code_pro, nom_pro7 AS nom_pro,type_pro, nb_ftth, nb_ftte
 FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro7=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
 UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro8 AS code_pro, type_pro, nb_ftth, nb_ftte
+SELECT DISTINCT ON (ad_code) ad_code, type_pro8 AS code_pro, nom_pro8 AS nom_pro,type_pro, nb_ftth, nb_ftte
 FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro8=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
 UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro9 AS code_pro, type_pro, nb_ftth, nb_ftte
+SELECT DISTINCT ON (ad_code) ad_code, type_pro9 AS code_pro, nom_pro9 AS nom_pro,type_pro, nb_ftth, nb_ftte
 FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro9=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
 UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro10 AS code_pro, type_pro, nb_ftth, nb_ftte
+SELECT DISTINCT ON (ad_code) ad_code, type_pro10 AS code_pro, nom_pro10 AS nom_pro,type_pro, nb_ftth, nb_ftte
 FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro10=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte,type_pro )
@@ -508,98 +457,12 @@ SELECT * FROM nb_prises
 WHERE nb_ftth IS NOT NULL ;
 
 
-
 --- Schema : rbal
---- Vue : v_bal_hsn_point_2154_ftth_ftte
+--- Vue : v_ctrl_bal_ftth_ftte
 --- Traitement : Vue qui contient pour chaque ad_code le nombre total de prises ftth et ftte
 
-/*CREATE OR REPLACE VIEW rbal.v_bal_hsn_point_2154_ftth_ftte AS
-WITH nb_prises AS
-(SELECT DISTINCT ON (ad_code) ad_code, type_pro1 AS code_pro, type_pro, nb_ftth, nb_ftte
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro1=b.code 
-GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
-UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro2 AS code_pro, type_pro, nb_ftth, nb_ftte
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro2=b.code 
-GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
-UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro3 AS code_pro, type_pro, nb_ftth, nb_ftte
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro3=b.code 
-GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
-UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro4 AS code_pro, type_pro, nb_ftth, nb_ftte
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro4=b.code 
-GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
-UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro5 AS code_pro, type_pro, nb_ftth, nb_ftte
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro5=b.code 
-GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
-UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro6 AS code_pro, type_pro, nb_ftth, nb_ftte
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro6=b.code 
-GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
-UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro7 AS code_pro, type_pro, nb_ftth, nb_ftte
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro7=b.code 
-GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
-UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro8 AS code_pro, type_pro, nb_ftth, nb_ftte
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro8=b.code 
-GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
-UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro9 AS code_pro, type_pro, nb_ftth, nb_ftte
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro9=b.code 
-GROUP BY ad_code, nb_ftth, nb_ftte, type_pro
-UNION ALL
-SELECT DISTINCT ON (ad_code) ad_code, type_pro10 AS code_pro, type_pro, nb_ftth, nb_ftte
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro10=b.code 
-GROUP BY ad_code, nb_ftth, nb_ftte,type_pro )
 
-SELECT  nb_prises.ad_code,  sum(nb_ftth) AS nb_ftth, sum(nb_ftte) AS nb_ftte, nom_pro FROM nb_prises
-
-LEFT JOIN 
-
-(SELECT nom_pro, ad_code
-FROM
-( 
-WITH nom_pro_agg AS
-(SELECT type_pro1,type_pro2,type_pro3,type_pro4,type_pro5,type_pro6,type_pro7,type_pro8,type_pro9,type_pro10, ad_code
-FROM
-( 
-WITH nom_pro AS
-(SELECT (case when type_pro1 like code_pro THEN type_pro END)type_pro1, 
-                (case when type_pro2 like code_pro THEN type_pro END)type_pro2, 
-                (case when type_pro3 like code_pro THEN type_pro END)type_pro3, 
-                (case when type_pro4 like code_pro THEN type_pro END)type_pro4, 
-                (case when type_pro5 like code_pro THEN type_pro END)type_pro5, 
-                (case when type_pro6 like code_pro THEN type_pro END)type_pro6,
-                (case when type_pro7 like code_pro THEN type_pro END)type_pro7,
-                (case when type_pro8 like code_pro THEN type_pro END)type_pro8,
-                (case when type_pro9 like code_pro THEN type_pro END)type_pro9,
-                (case when type_pro10 like code_pro THEN type_pro END)type_pro10, 
-a.ad_code
-FROM rbal.bal_hsn_point_2154 a
-LEFT JOIN rbal.v_bal_hsn_point_2154_nb_prises b on a.ad_code=b.ad_code
-GROUP BY a.ad_code, b.code_pro, b.type_pro)
-SELECT * FROM nom_pro)a)
-SELECT array_to_string(ARRAY[type_pro1,type_pro2,type_pro3,type_pro4,type_pro5,type_pro6,type_pro7,type_pro8,type_pro9,type_pro10 ], ',', '*') AS nom_pro, 
-ad_code FROM nom_pro_agg)a)nom_pro_agg ON nom_pro_agg.ad_code=nb_prises.ad_code
-WHERE nb_ftth IS NOT NULL 
-GROUP BY nb_prises.ad_code, nom_pro;
-*/
-
-
-CREATE OR REPLACE VIEW rbal.v_bal_hsn_point_2154_ftth_ftte AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_ftth_ftte AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
 (WITH nb_prises AS
@@ -653,30 +516,26 @@ FROM rbal.bal_hsn_point_2154 a
 LEFT JOIN rbal.l_bal_pro_hsn b on a.type_pro10=b.code 
 GROUP BY ad_code, nb_ftth, nb_ftte,type_pro )
 
-SELECT  nb_prises.ad_code,  sum(nb_ftth) AS nb_ftth, sum(nb_ftte) AS nb_ftte, nom_pro FROM nb_prises
+SELECT  nb_prises.ad_code,  sum(nb_ftth) AS nb_ftth, sum(nb_ftte) AS nb_ftte, typologie_pro, nom_pro FROM nb_prises
 
 LEFT JOIN 
 
-(SELECT ad_code, nom_pro
+(SELECT ad_code, typologie_pro, nom_pro
 FROM
 ( 
 WITH nom_pro AS
-(SELECT ad_code, array_to_string(array_agg(type_pro),';') AS nom_pro
-FROM  rbal.v_bal_hsn_point_2154_nb_prises 
+(SELECT ad_code, array_to_string(array_agg(type_pro),';') AS typologie_pro, array_to_string(array_agg(nom_pro),';') AS nom_pro
+FROM  rbal.v_ctrl_bal_nb_prises 
 GROUP BY ad_code)
 SELECT * FROM nom_pro)a)nom_pro ON nom_pro.ad_code=nb_prises.ad_code
 WHERE nb_ftth IS NOT NULL 
-GROUP BY nb_prises.ad_code, nom_pro)a;
-
-
-
-
+GROUP BY nb_prises.ad_code, typologie_pro, nom_pro)a;
 
 
 --- Schema : rbal
---- Vue : v_bal_erreurs_nbprises
+--- Vue : v_ctrl_bal_erreurs_nbprises
 --- Traitement : Vue qui répertorie les incohérences de nombre de prises (ad_nblhab, ad_nblpro, type_pro)
-CREATE OR REPLACE VIEW rbal.v_bal_erreurs_nbprises AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_erreurs_nbprises AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
 (SELECT distinct on (bal.ad_code) bal.ad_code,  ad_nblhab, ad_nblpro, 
@@ -754,26 +613,14 @@ AND ad_nblhab = 0)
 SELECT * FROM sans_prises)a)sans_prises ON sans_prises.ad_code=bal.ad_code)a
 WHERE erreur NOT LIKE '*,*,*';
 
---- Schema : rbal
---- Vue : v_bal_erreurs_ad_racc
---- Traitement : Vue qui contient toutes les BAL sans ad_racc (sauf pour les supprimés)
-
-CREATE OR REPLACE VIEW rbal.v_bal_erreurs_ad_racc AS
-SELECT ad_numero, ad_rep, ad_nombat, ad_racc, ad_comment, ad_nblhab, ad_nblpro, construction, destruction, 
-type_pro1, nom_pro1, type_pro2, nom_pro2, type_pro3, nom_pro3, type_pro4, nom_pro4, type_pro5, nom_pro5, 
-type_pro6, nom_pro6, type_pro7, nom_pro7, type_pro8, nom_pro8, type_pro9, nom_pro9, type_pro10, nom_pro10, 
-ad_creadat, ad_ban_id, geom, ad_code
-FROM rbal.bal_hsn_point_2154
-WHERE ad_racc IS NULL AND destruction NOT LIKE 'Supprimé' AND ad_nblhab > 0 
-OR ad_racc IS NULL AND destruction NOT LIKE 'Supprimé' AND ad_nblpro > 0;
 
 
 --- Schema : rbal
---- Vue : v_bal_erreurs_ad_racc
+--- Vue : v_ctrl_bal_erreurs_numero
 --- Traitement : Vue qui contient toutes les BAL dont le numero ne correspond pas à celui de la BAN et/ou de locaux_hsn
 
 
-CREATE OR REPLACE VIEW rbal.v_bal_erreurs_numero AS
+CREATE OR REPLACE VIEW rbal.v_ctrl_bal_erreurs_numero AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
 (WITH bal AS
@@ -792,7 +639,7 @@ WITH bal_numero_erreur AS
  liaison_id, 
  ad_code,  
  ad_numero, 
- n°_dans_la as numero,
+ numero,
  incoherence_hsn as incoherence ,
  geom
 FROM
@@ -805,10 +652,10 @@ FROM
 (
 WITH ban_liaison AS
 (
-SELECT  distinct on (a.id) a.id,  n°_dans_la
+SELECT  distinct on (a.id) a.id,  numero
   FROM psd_orange.locaux_hsn_sian_zanro_point_2154 a
   INNER JOIN  rbal.liaison_hsn_linestring_2154 b ON a.id=b.id_locaux)
-  SELECT id, liaison_id, ad_code, n°_dans_la,  LPAD(ad_numero::text, 4, '0')ad_numero_, ad_numero,'Locaux HSN'::varchar as incoherence_hsn, geom FROM ban_liaison
+  SELECT id, liaison_id, ad_code, numero,  LPAD(ad_numero::text, 4, '0')ad_numero_, ad_numero,'Locaux HSN'::varchar as incoherence_hsn, geom FROM ban_liaison
 
 LEFT JOIN 
 (SELECT ad_code, ad_numero, ad_rep, liaison_id, id_locaux, geom
@@ -827,7 +674,7 @@ WITH bal_liaison AS
       rbal.bal_hsn_point_2154 as a, rbal.liaison_hsn_linestring_2154 as b
       WHERE ST_DWithin(b.geom, a.geom, 0.1) )
   SELECT * FROM bal_liaison)a)bal_liaison ON bal_liaison.id_locaux=ban_liaison.id)a
-  WHERE cast(ad_numero_ as varchar) <> n°_dans_la
+  WHERE cast(ad_numero_ as varchar) <> numero
   ORDER BY liaison_id)
   SELECT * FROM bal_liaison_locaux)a)
   
