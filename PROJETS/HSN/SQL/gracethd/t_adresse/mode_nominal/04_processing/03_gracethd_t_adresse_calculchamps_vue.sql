@@ -1,4 +1,4 @@
-/*
+﻿/*
 -------------------------------------------------------------------------------------
 Auteur : Marine FAUCHER (METIS)
 Date de création : 2/06/2018
@@ -26,7 +26,7 @@ WITH columns_gracethdview AS
   NULL::varchar as ad_seq,
   ad_racc,
   ad_nombat, 
-  ad_comment, 
+  NULL::varchar as ad_comment, 
   ad_creadat, 
   (CASE WHEN ad_nblhab IS NOT NULL THEN ad_nblhab ELSE 0 END)::int as ad_nblhab,
   (CASE WHEN ad_nblpro IS NOT NULL THEN ad_nblpro ELSE 0 END)::int ad_nblpro,
@@ -77,6 +77,8 @@ SELECT
   columns_gracethdview.nom_sro,
   t.digt_6,
   t.digt_7,
+  t.digt_8,
+  t.digt_9,
   columns_gracethdview.x,
   columns_gracethdview.y,
   p.ad_x_ban,

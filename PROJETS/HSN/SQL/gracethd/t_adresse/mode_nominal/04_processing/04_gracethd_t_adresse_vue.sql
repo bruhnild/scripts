@@ -1,4 +1,4 @@
-/*
+﻿/*
 -------------------------------------------------------------------------------------
 Auteur : Marine FAUCHER (METIS)
 Date de création : 26/06/2018
@@ -48,7 +48,7 @@ RETURNS TEXT
 LANGUAGE sql
 AS
 $$
-    SELECT to_char(nextval('rbal.bal_incrementation_ad_seq'), 'FM0000000'); 
+    SELECT to_char(nextval('rbal.bal_incrementation_ad_seq'), 'FM00000'); 
 $$;
 
 ------==========================================================================------
@@ -63,7 +63,7 @@ FROM
 (
 SELECT
 	a.ad_code as ad_code_bal,
-	concat('AD700', digt_6, digt_7, nextval_special()) as ad_code , 
+	concat('AD700', digt_6, digt_7, digt_8, digt_9, nextval_special()) as ad_code , 
 	ad_ban_id, 
 	ad_nomvoie, 
 	ad_fantoir, 
