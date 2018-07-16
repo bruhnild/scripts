@@ -711,6 +711,9 @@ CREATE TRIGGER trg_update_url
 AFTER INSERT OR UPDATE OR DELETE ON coordination.opportunite
 FOR EACH ROW EXECUTE PROCEDURE update_url();
 
+-- dans le shell psql créer autant de tables qu'il y a de valeurs de nom_sro 
+
+SELECT 'drop table if exists rbal.t_adresse_' || nom_sro || '; create table rbal.t_adresse_'|| nom_sro || ' as select * from rbal.t_adresse where nom_sro =' || quote_literal(nom_sro) || ';' AS requete FROM (SELECT DISTINCT nom_sro FROM rbal.t_adresse) AS a \gexec
 
 
 --- Supprimer table récalcitrante (pid)
