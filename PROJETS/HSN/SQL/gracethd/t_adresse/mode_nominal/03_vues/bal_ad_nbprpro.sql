@@ -12,7 +12,12 @@ Sources: rbal.v_ctrl_bal_ftth_ftte (nb_ftth) via rbal.l_bal_pro_hsn (code) et rb
 CREATE OR REPLACE VIEW rbal.v_bal_ad_nbprpro AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
--- ad_nbprpro = 0 par defaut
+/*
+-------------------------------------------------------------------------------------
+NOMBRE DE PRISE PRO = 0
+-------------------------------------------------------------------------------------
+*/
+
 (
 SELECT 
   hp.ad_code,
@@ -32,8 +37,16 @@ FROM rbal.bal_hsn_point_2154 a, rbal.v_ctrl_bal_ftth_ftte b
 WHERE a.ad_code=b.ad_code)
 
 SELECT ad_code, ad_nbprpro FROM ad_insee_postal_commune)a)
+/*
+-------------------------------------------------------------------------------------
+NOMBRE DE PRISE PRO > 0
+-------------------------------------------------------------------------------------
+*/
+
+-------------------------------------------------------------------------------------
 UNION ALL
--- nb_ftth = ad_nbprpro 
+-------------------------------------------------------------------------------------
+
 SELECT ad_code, ad_nbprpro FROM 
 (WITH ad_nbprpro AS
 (SELECT 

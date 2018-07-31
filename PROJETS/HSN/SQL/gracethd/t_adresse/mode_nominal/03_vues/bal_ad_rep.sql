@@ -15,8 +15,11 @@ CREATE OR REPLACE VIEW rbal.v_bal_ad_rep AS
 
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
-------------------------------------------------------
--- Tout ce qui n'a pas de ad_rep
+/*
+-------------------------------------------------------------------------------------
+TOUT CE QUI EST SANS REP
+-------------------------------------------------------------------------------------
+*/
 (
 SELECT 
  hp.ad_code,
@@ -30,7 +33,7 @@ WHERE
 (WITH bal_ad_rep AS 
 (SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
--- ad_rep (bal)
+
 (
 SELECT 
   hp.ad_code,
@@ -55,7 +58,7 @@ WHERE ad_ban_id IS NOT NULL)a)
 AND ad_numero IS NOT NULL
 
 UNION ALL
--- ad_rep (ban)
+
 (SELECT DISTINCT ON (ad_code) ad_code, rep
 FROM
 (
@@ -71,14 +74,21 @@ WHERE ad_rep_ban IS NOT NULL)a)) a
 WHERE ad_rep IS NOT NULL )
 SELECT * FROM bal_ad_rep)a)
 
+
+-------------------------------------------------------------------------------------
 UNION ALL 
----------------------------------------
--- Tout ce qui a un ad_rep
+-------------------------------------------------------------------------------------
+
+/*
+-------------------------------------------------------------------------------------
+TOUT CE QUI A UN REP
+-------------------------------------------------------------------------------------
+*/
 SELECT ad_code, ad_rep FROM 
 (WITH bal_ad_rep AS 
 (SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
--- ad_rep (bal)
+-----------------REP AVEC BAL
 (
 SELECT 
   hp.ad_code,
@@ -102,8 +112,10 @@ SELECT ad_code, ad_ban_id, rep FROM ad_rep_ban
 WHERE ad_ban_id IS NOT NULL)a) 
 AND ad_numero IS NOT NULL
 
+-----------------REP AVEC BAN
 UNION ALL
--- ad_rep (ban)
+-----------------REP AVEC BAN
+
 (SELECT DISTINCT ON (ad_code) ad_code, rep
 FROM
 (

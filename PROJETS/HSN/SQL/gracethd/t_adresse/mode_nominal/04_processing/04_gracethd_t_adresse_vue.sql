@@ -1,4 +1,4 @@
-﻿/*
+/*
 -------------------------------------------------------------------------------------
 Auteur : Marine FAUCHER (METIS)
 Date de création : 26/06/2018
@@ -63,7 +63,7 @@ FROM
 (
 SELECT
 	a.ad_code as ad_code_bal,
-	concat('AD700', digt_6, digt_7, digt_8, digt_9, nextval_special()) as ad_code , 
+	concat('AD700', digt_6, digt_7, digt_8, digt_9, to_char(a.ad_code, 'FM00000')) as ad_code , 
 	ad_ban_id, 
 	ad_nomvoie, 
 	ad_fantoir, 
@@ -111,7 +111,7 @@ SELECT
 	NULL::numeric as ad_geolqlt, 
 	NULL::varchar as ad_geolmod, 
 	NULL::varchar as ad_geolsrc, 
-	ad_creadat, 
+	now() as ad_creadat, 
 	NULL::timestamp as ad_majdate, 
 	NULL::timestamp as ad_majsrc, 
 	NULL::date as ad_abddate, 

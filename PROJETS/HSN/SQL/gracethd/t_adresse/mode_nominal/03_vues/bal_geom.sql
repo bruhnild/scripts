@@ -1,8 +1,24 @@
+/*
+-------------------------------------------------------------------------------------
+Auteur : Marine FAUCHER (METIS)
+Date de création : 26/06/2018
+Objet : Création de la vue v_bal_geom pour snapper les geom dans les centroides de batiments (sauf si plusieurs bals par batiment)
+Modification : Nom : ///// - Date : date_de_modif - Motif/nature : //////
+
+Sources: rbal.bal_hsn_point_2154 (geom)/ pci70_edigeo_majic.geo_batiment (centroide geom)
+-------------------------------------------------------------------------------------
+*/
+
+
+
 CREATE OR REPLACE VIEW rbal.v_bal_geom AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, * 
 FROM(
-  --------------------------------------------
--- Toutes les bal qui ne sont pas dans un batiment 
+/*
+-------------------------------------------------------------------------------------
+TOUTES LES BALS QUI NE SONT PAS DANS UN BATIMENT
+-------------------------------------------------------------------------------------
+*/
 SELECT 
   hp.ad_code,
   hp.geom
@@ -51,8 +67,11 @@ SELECT * FROM geo_batiment)a))a))
 SELECT * FROM st_snap_bal_in_bat)a)
 
 UNION ALL
---------------------------------------------
--- Toutes les bal qui sont dans un batiment (snappées)
+/*
+-------------------------------------------------------------------------------------
+TOUTES LES BALS QUI SONT DANS UN BATIMENT
+-------------------------------------------------------------------------------------
+*/
 SELECT ad_code, geom FROM 
 (WITH st_snap_bal_in_bat AS
 ((SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, * 

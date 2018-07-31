@@ -41,9 +41,9 @@ FROM ban.hsn_point_2154 b
 SELECT id_fantoir , id FROM ad_fantoir_ban)a)ad_fantoir_ban ON ad_fantoir_ban.id=ad_ban_id_liaison.ad_ban_id
 WHERE id_fantoir IS NOT NULL)a)
             
------------------AD FANTOIR AVEC GEO FONCIER (SANS BAN) 
+
 UNION ALL
------------------AD FANTOIR AVEC GEO FONCIER (SANS BAN) 
+
 (SELECT ad_code, ad_fantoir FROM
 (WITH ad_fantoir_geofoncier AS
 (SELECT 
@@ -92,6 +92,7 @@ TOUT CE QUI A UN AD FANTOIR
 -----------------AD FANTOIR AVEC BAN
  UNION ALL
 -----------------AD FANTOIR AVEC BAN
+
 (SELECT ad_code, ad_fantoir FROM
 (WITH ad_fantoir AS
 ((SELECT ad_code, ad_fantoir FROM 
@@ -119,6 +120,7 @@ WHERE id_fantoir IS NOT NULL)a)
 -----------------AD FANTOIR AVEC GEO FONCIER (SANS BAN) 
 UNION ALL
 -----------------AD FANTOIR AVEC GEO FONCIER (SANS BAN) 
+
 (SELECT ad_code, ad_fantoir FROM
 (WITH ad_fantoir_geofoncier AS
 (SELECT 

@@ -28,6 +28,7 @@
 
 SET search_path TO gracethd_metis, public;
 
+DROP TABLE IF EXISTS t_adresse CASCADE;
 DROP TABLE IF EXISTS t_cheminement CASCADE;
 DROP TABLE IF EXISTS t_conduite CASCADE;
 DROP TABLE IF EXISTS t_cond_chem CASCADE;
@@ -64,7 +65,9 @@ DROP TABLE IF EXISTS t_empreinte CASCADE;
 
 
 
-CREATE TABLE t_adresse(	ad_code VARCHAR (254) NOT NULL  ,
+
+CREATE TABLE t_adresse(	ad_code VARCHAR (254) PRIMARY KEY  ,
+	ad_seq VARCHAR (254),
 	ad_ban_id VARCHAR (24)   ,
 	ad_nomvoie VARCHAR (254)   ,
 	ad_fantoir VARCHAR (10)   ,
@@ -118,14 +121,18 @@ CREATE TABLE t_adresse(	ad_code VARCHAR (254) NOT NULL  ,
 	nom_sro VARCHAR(254)   ,
 	nb_prises_totale INTEGER   ,
 	statut VARCHAR(2)  REFERENCES l_ad_statut(code), 
+	cas_particuliers VARCHAR(254)   ,
 	nom_id VARCHAR(254)   ,
 	nom_pro VARCHAR(254)   ,
+	typologie_pro VARCHAR(254)   ,
 	x NUMERIC ,
 	y NUMERIC   ,
 	potentiel_ftte INTEGER,
-	categorie_adresse VARCHAR(254)   ,
-	geom Geometry(Point,2154) NOT NULL  ,
-CONSTRAINT "t_adresse_pk" PRIMARY KEY (ad_code));	
+	geom Geometry(Point,2154) NOT NULL  
+	);	
+	
+
+ALTER TABLE t_adresse ALTER COLUMN ad_creadat SET DEFAULT NOW();
 	
 CREATE TABLE t_organisme(	or_code VARCHAR (20) NOT NULL  ,
 	or_siren VARCHAR(9)   ,
@@ -188,7 +195,8 @@ CREATE TABLE t_noeud(	nd_code VARCHAR(254) NOT NULL  ,
 	nd_abdsrc VARCHAR(254)   ,
 	geom Geometry(Point,2154) NOT NULL  ,
 CONSTRAINT "t_noeud_pk" PRIMARY KEY (nd_code));	
-	
+
+
 CREATE TABLE t_znro(	zn_code VARCHAR(254) NOT NULL  ,
 	zn_nd_code VARCHAR(254) NOT NULL  REFERENCES t_noeud (nd_code),
 	zn_r1_code VARCHAR(100)   ,
@@ -209,6 +217,8 @@ CREATE TABLE t_znro(	zn_code VARCHAR(254) NOT NULL  ,
 	zn_abdsrc VARCHAR(254)   ,
 	geom geometry(MultiPolygon,2154)   ,
 CONSTRAINT "t_znro_pk" PRIMARY KEY (zn_code));	
+
+
 	
 CREATE TABLE t_zsro(	zs_code VARCHAR(254) NOT NULL  ,
 	zs_nd_code VARCHAR(254) NOT NULL  REFERENCES t_noeud (nd_code),
@@ -240,6 +250,8 @@ CREATE TABLE t_zsro(	zs_code VARCHAR(254) NOT NULL  ,
 	zs_abdsrc VARCHAR(254)   ,
 	geom geometry(MultiPolygon,2154)   ,
 CONSTRAINT "t_zsro_pk" PRIMARY KEY (zs_code));	
+
+
 	
 CREATE TABLE t_zpbo(	zp_code VARCHAR(254) NOT NULL  ,
 	zp_nd_code VARCHAR(254) NOT NULL  REFERENCES t_noeud (nd_code),

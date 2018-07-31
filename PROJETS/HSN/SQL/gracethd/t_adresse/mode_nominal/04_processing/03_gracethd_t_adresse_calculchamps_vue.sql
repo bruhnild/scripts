@@ -1,4 +1,4 @@
-﻿/*
+/*
 -------------------------------------------------------------------------------------
 Auteur : Marine FAUCHER (METIS)
 Date de création : 2/06/2018
@@ -23,7 +23,6 @@ FROM
 WITH columns_gracethdview AS
 (SELECT 
   DISTINCT ON (ad_code) a.ad_code,
-  NULL::varchar as ad_seq,
   ad_racc,
   ad_nombat, 
   NULL::varchar as ad_comment, 
@@ -44,7 +43,6 @@ WHERE ST_CONTAINS (b.geom, a.geom))
 SELECT 
   columns_gracethdview.ad_code,
   j.ad_ban_id,
-  columns_gracethdview.ad_seq,
   k.ad_nomvoie,
   m.ad_rep,
   r.ad_numero,
@@ -108,9 +106,7 @@ LEFT JOIN  rbal.v_bal_nom_sro t ON columns_gracethdview.ad_code = t.ad_code)a;
 
 CREATE INDEX vm_bal_columns_gracethdview_gix ON rbal.vm_bal_columns_gracethdview USING GIST (geom);
 
-*/
 
-REFRESH MATERIALIZED VIEW rbal.vm_bal_columns_gracethdview;
 
 --- Schema : rbal
 --- Vue : vm_bal_columns_gracethdview

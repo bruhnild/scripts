@@ -13,8 +13,12 @@ Sources: rbal.bal_hsn_point_2154 (numero)/ ban.hsn_point_2154 (numero)
 CREATE OR REPLACE VIEW rbal.v_bal_ad_numero AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
-------------------------------------------
--- Tout ce qui n'a pas de numero
+/*
+-------------------------------------------------------------------------------------
+TOUT CE QUI EST SANS NUMERO
+-------------------------------------------------------------------------------------
+*/
+
 (
 SELECT 
   hp.ad_code,
@@ -28,7 +32,7 @@ WHERE
 (WITH bal_ad_numero AS
 ((SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
--- ad_numero (bal)
+
 (
 SELECT 
   hp.ad_code,
@@ -53,7 +57,7 @@ WHERE ad_ban_id IS NOT NULL)a)
 AND ad_numero IS NOT NULL
 
 UNION ALL
--- ad_numero (ban)
+
 (SELECT DISTINCT ON (ad_code) ad_code, numero
 FROM
 (
@@ -69,14 +73,25 @@ WHERE ad_ban_id IS NOT NULL)a)) a
 WHERE ad_numero IS NOT NULL ))
 SELECT * FROM bal_ad_numero)a)
 
-UNION ALL 
-------------------------------------------
--- Tout ce qui a un numero
+
+
+/*
+-------------------------------------------------------------------------------------
+TOUT CE QUI A UN NUMERO
+-------------------------------------------------------------------------------------
+*/
+
+-------------------------------------------------------------------------------------
+UNION ALL
+-------------------------------------------------------------------------------------
+
+
+
 SELECT ad_code, ad_numero FROM 
 (WITH bal_ad_numero AS
 ((SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
--- ad_numero (bal)
+-----------------NUMERO AVEC BAL
 (
 SELECT 
   hp.ad_code,
@@ -100,8 +115,10 @@ SELECT ad_code, ad_ban_id, numero FROM ad_numero_ban
 WHERE ad_ban_id IS NOT NULL)a) 
 AND ad_numero IS NOT NULL
 
+-----------------NUMERO AVEC BAN
 UNION ALL
--- ad_numero (ban)
+-----------------NUMERO AVEC BAN
+
 (SELECT DISTINCT ON (ad_code) ad_code, numero
 FROM
 (

@@ -12,7 +12,11 @@ Sources: rbal.v_ctrl_bal_ftth_ftte (nb_ftte)
 CREATE OR REPLACE VIEW rbal.v_bal_potentiel_ftte AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
--- ad_nbprpro = 0 par defaut
+/*
+-------------------------------------------------------------------------------------
+POTENTIEL FTTE = 0
+-------------------------------------------------------------------------------------
+*/
 (
 SELECT 
   hp.ad_code,
@@ -32,8 +36,16 @@ FROM rbal.bal_hsn_point_2154 a, rbal.v_ctrl_bal_ftth_ftte b
 WHERE a.ad_code=b.ad_code)
 
 SELECT ad_code, potentiel_ftte FROM ad_insee_postal_commune)a)
+
+-------------------------------------------------------------------------------------
 UNION ALL
--- nb_ftte = potentiel_ftte 
+-------------------------------------------------------------------------------------
+
+/*
+-------------------------------------------------------------------------------------
+POTENTIEL FTTE > 0
+-------------------------------------------------------------------------------------
+*/
 SELECT ad_code, potentiel_ftte FROM 
 (WITH potentiel_ftte AS
 (SELECT 

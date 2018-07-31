@@ -130,3 +130,6 @@ CREATE TABLE l_tiroir_type(code VARCHAR(10), libelle VARCHAR(254), definition VA
 CREATE TABLE l_tube(code VARCHAR(5), libelle VARCHAR(254), definition VARCHAR(254), CONSTRAINT "l_tube_pk" PRIMARY KEY (code));
 CREATE TABLE l_zone_densite(code VARCHAR(1), libelle VARCHAR(254), definition VARCHAR(254), CONSTRAINT "l_zone_densite_pk" PRIMARY KEY (code));
 
+
+
+

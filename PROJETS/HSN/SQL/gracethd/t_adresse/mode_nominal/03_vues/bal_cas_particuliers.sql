@@ -5,8 +5,13 @@ SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
 FROM
 
 (
----------------------------------------------------
--- TOUT CE QUI N'A PAS DE CAS PARTICULIERS
+
+/*
+-------------------------------------------------------------------------------------
+ TOUT CE QUI N'A PAS DE CAS PARTICULIERS
+-------------------------------------------------------------------------------------
+*/
+
 SELECT 
 hp.ad_code,
 NULL::varchar as cas_particuliers
@@ -54,8 +59,11 @@ GROUP BY ad_code)a
 SELECT * FROM liste_cas_particuliers_agg)a)
  
  
----------------------------------------------------
--- TOUT CE QUI A UN OU PLUSIEURS CAS PARTICULIERS
+/*
+-------------------------------------------------------------------------------------
+ TOUT CE QUI A UN OU PLUSIEURS CAS PARTICULIERS
+-------------------------------------------------------------------------------------
+*/
 
 UNION ALL 
 
@@ -234,7 +242,7 @@ select deps_restore_dependencies('rbal', 'vm_bal_columns_gracethdview');
 --dependencies hierarchy
 --proper order of dropping and creating views/materialized views across hierarchy
 --restoring comments and grants on views/materialized views
-*/
+
 
 --drop all views and materialized views dependent on p_schema_name.p_object_name 
 --and save DDL which restores them in a helper table.
@@ -242,85 +250,5 @@ select deps_restore_dependencies('rbal', 'vm_bal_columns_gracethdview');
 --select * from deps_saved_ddl;
 --restore those dropped objects
 --select deps_restore_dependencies('rbal', 'vm_bal_columns_gracethdview');
-
-/*
--------------------------------------------------------------------------------------
-OLD
-
-
-
-SELECT ad_code, cas_particuliers::varchar FROM 
-(WITH liste_cas_particuliers_agg AS  
-(SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
-FROM
-(
-SELECT ad_code, array_to_string(array_agg(cas_particuliers),';') AS cas_particuliers FROM 
-(WITH liste_cas_particuliers AS
-(SELECT cas_particuliers, ad_code FROM
-(WITH cas_particulier1 AS
-(SELECT (CASE WHEN ad_ban_id IS NULL AND nom_id IS NULL THEN 'Adresse à créer'END)::varchar as cas_particuliers, ad_code
-FROM rbal.vm_bal_columns_gracethdview)
-SELECT * FROM cas_particulier1
-WHERE cas_particuliers IS NOT NULL )a
-UNION ALL
-SELECT cas_particuliers, ad_code FROM
-(WITH cas_particulier2 AS
-(SELECT (CASE WHEN ad_ban_id IS NULL AND nom_id IS NOT NULL THEN 'Adresse BAN inexistante mais locaux présents'END)::varchar as cas_particuliers, ad_code
-FROM rbal.vm_bal_columns_gracethdview)
-SELECT * FROM cas_particulier2
-WHERE cas_particuliers IS NOT NULL)b
-UNION ALL
-SELECT cas_particuliers, ad_code FROM
-(WITH cas_particulier3 AS
-(SELECT (CASE WHEN nom_pro LIKE '%Transformateurs Electriques%' THEN 'Transformateur électrique'END)::varchar as cas_particuliers, ad_code
-FROM rbal.vm_bal_columns_gracethdview)
-SELECT * FROM cas_particulier3
-WHERE cas_particuliers IS NOT NULL)c
-UNION ALL
-SELECT cas_particuliers, ad_code FROM
-(WITH cas_particulier4 AS
-(SELECT (CASE WHEN ad_isole IS TRUE THEN 'Site à prendre en compte (isolé)?' END)::varchar as cas_particuliers, ad_code
-FROM rbal.vm_bal_columns_gracethdview)
-SELECT * FROM cas_particulier4
-WHERE cas_particuliers IS NOT NULL)d
-UNION ALL
-SELECT cas_particuliers, ad_code FROM
-(WITH cas_particulier5 AS
-(SELECT (CASE WHEN nom_pro LIKE 'Antenne telecom' THEN 'Telecom (Antenne) à prendre en compte?'END)::varchar as cas_particuliers, ad_code
-FROM rbal.vm_bal_columns_gracethdview)
-SELECT * FROM cas_particulier5
-WHERE cas_particuliers IS NOT NULL)e
-UNION ALL
-SELECT cas_particuliers, ad_code FROM
-(WITH cas_particulier6 AS
-(SELECT (CASE WHEN nom_pro LIKE 'Poste de refoulement' THEN 'Poste de refoulement à prendre en compte?'END)::varchar as cas_particuliers, ad_code
-FROM rbal.vm_bal_columns_gracethdview)
-SELECT * FROM cas_particulier6
-WHERE cas_particuliers IS NOT NULL)f
-UNION ALL
-SELECT cas_particuliers, ad_code FROM
-(WITH cas_particulier7 AS
-(SELECT (CASE WHEN nom_pro LIKE 'Poste de gaz' THEN 'Poste gaz à prendre en compte?'END)::varchar as cas_particuliers, ad_code
-FROM rbal.vm_bal_columns_gracethdview)
-SELECT * FROM cas_particulier7
-WHERE cas_particuliers IS NOT NULL)g
-UNION ALL
-SELECT cas_particuliers, ad_code FROM
-(WITH cas_particulier8 AS
-(SELECT (CASE WHEN nom_pro LIKE 'Château d’eau avec antenne telecom' THEN 'Château d''eau à prendre en compte?'END)::varchar as cas_particuliers, ad_code
-FROM rbal.vm_bal_columns_gracethdview)
-SELECT * FROM cas_particulier8
-WHERE cas_particuliers IS NOT NULL)h
-UNION ALL
-SELECT cas_particuliers, ad_code FROM
-(WITH cas_particulier7 AS
-(SELECT (CASE WHEN nb_prises_totale = 0 OR statut = 'S' THEN 'Site à supprimer (pas de prise)' END)::varchar as cas_particuliers, ad_code
-FROM rbal.vm_bal_columns_gracethdview)
-SELECT * FROM cas_particulier7)i)
-SELECT * FROM liste_cas_particuliers
-WHERE cas_particuliers IS NOT NULL) a
-WHERE cas_particuliers IS NOT NULL 
-GROUP BY ad_code)a)
-SELECT * FROM liste_cas_particuliers_agg)a)a;
--------------------------------------------------------------------------------------
 */
+-------------------------------------------------------------------------------------
