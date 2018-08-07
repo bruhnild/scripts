@@ -16,7 +16,7 @@ CREATE ROLE group_metis_hsn WITH
   CONNECTION LIMIT -1;
 
 ---Requête de création des utilisateurs---
-CREATE USER msteiner WITH LOGIN ENCRYPTED PASSWORD '4Kf37fTe';
+CREATE USER msteiner WITH LOGIN ENCRYPTED PASSWORD 'xxx';
 
 --- Requete de création des droits associés
 

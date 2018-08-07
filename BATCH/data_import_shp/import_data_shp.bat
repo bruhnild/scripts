@@ -51,7 +51,7 @@ set pgschema=rip1
 ::set pgtable_prefix=""
 
 set pguser=postgres
-set pgpassword=postgres
+set pgpassword=xxx
 
 
 REM "Parcourir le dossier et creer un fichier sql pour chaque shp "

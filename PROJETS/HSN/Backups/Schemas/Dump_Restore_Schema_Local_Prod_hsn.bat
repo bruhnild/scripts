@@ -2,7 +2,7 @@
 C:
 IF NOT EXIST "C:\Program Files\PostgreSQL\10\bin" GOTO NOWINDIR
 CD Program Files\PostgreSQL\10\bin\
-set PGPASSWORD=l0cA!L8:
+set PGPASSWORD=xxx
 rem pg_dump.exe -h 192.168.101.254 -p 5432 -U postgres -v -f I:\20-MOE70-HSN\07-Scripts\Backups\Schemas\ban.sql -n ban  hsn
 rem pg_dump.exe -h 192.168.101.254 -p 5432 -U postgres -v -f I:\20-MOE70-HSN\07-Scripts\Backups\Schemas\rbal.sql -n rbal  hsn
 rem pg_dump.exe -h 192.168.101.254 -p 5432 -U postgres -v -f I:\20-MOE70-HSN\07-Scripts\Backups\Schemas\orange.sql -n orange  hsn
@@ -13,7 +13,7 @@ rem pg_dump.exe -h 192.168.101.254 -p 5432 -U postgres -v -f I:\20-MOE70-HSN\07-
 pg_dump.exe -h 192.168.101.254 -p 5432 -U postgres -v -f I:\20-MOE70-HSN\07-Scripts\Backups\Schemas\osm.sql -n  osm hsn
 pg_dump.exe -h 192.168.101.254 -p 5432 -U postgres -v -f I:\20-MOE70-HSN\07-Scripts\Backups\Schemas\la_poste.sql -n  la_poste hsn
 @echo Les schemas sont sauvegardes
-set PGPASSWORD=leoHe:4?d
+set PGPASSWORD=xxx
 rem psql.exe -h production.metis-map.fr -p 5432 -U postgres -d hsn -c "DROP SCHEMA IF EXISTS ban CASCADE;" 
 rem psql.exe -h production.metis-map.fr -p 5432 -U postgres -d hsn -c "CREATE SCHEMA ban;" -f I:\20-MOE70-HSN\07-Scripts\Backups\Schemas\ban.sql
 rem psql.exe -h production.metis-map.fr -p 5432 -U postgres -d hsn -c "DROP SCHEMA IF EXISTS rbal CASCADE;" 
