@@ -12,8 +12,8 @@ Modification : Nom : ///// - Date : date_de_modif - Motif/nature : //////
 --- Table : t_adresse
 --- Traitement : Rempli la table t_adresse avec les nouvelles valeurs de v_adresse
 
-TRUNCATE gracethd_metis.t_adresse CASCADE;
-TRUNCATE rbal.t_adresse CASCADE;
+--TRUNCATE gracethd_metis.t_adresse CASCADE;
+--TRUNCATE rbal.t_adresse CASCADE;
 
 INSERT INTO rbal.t_adresse ( 
 	ad_code, 
@@ -142,8 +142,9 @@ SELECT
 	y, 
 	potentiel_ftte, 
 	geom
-	FROM rbal.v_adresse;
-
+	FROM rbal.v_adresse
+--WHERE ad_racc NOT LIKE ''
+;
 ;
 
 --- Schema : gracethd_metis
@@ -275,8 +276,9 @@ SELECT
 	y, 
 	potentiel_ftte, 
 	geom
-	FROM rbal.t_adresse;
-
+	FROM rbal.t_adresse
+	--WHERE ad_racc NOT LIKE ''
+		;
 ;
 
 

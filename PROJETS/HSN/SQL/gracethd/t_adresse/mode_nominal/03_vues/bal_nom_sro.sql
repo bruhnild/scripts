@@ -9,10 +9,10 @@ Sources: psd_orange.zpm_hsn_polygon_2154(za_code_def)/ psd_orange.ref_code_zasro
 -------------------------------------------------------------------------------------
 */
 
+
 CREATE OR REPLACE VIEW rbal.v_bal_nom_sro AS
 SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, * 
 FROM(
-SELECT ad_code, za_code_def as nom_sro, b.digt_6, b.digt_7,b.digt_8, b.digt_9, a.geom  FROM 
+SELECT ad_code, b.za_code_def as nom_sro, b.digt_6, b.digt_7,b.digt_8, b.digt_9, a.geom  FROM 
 rbal.bal_hsn_point_2154 a,  psd_orange.zasro_hsn_polygon_2154 b
-LEFT JOIN psd_orange.ref_code_zasro c ON b.za_code = code_sro_initial
 WHERE ST_CONTAINS (b.geom, a.geom) )a;

@@ -117,3 +117,12 @@ SELECT
 ) ad_code ON ad_code.pt_id = a.za_code_def
 ;
 
+-- En cas de truncate de t_noeud t_zsro se truncate aussi
+-- Importer zsro en multipolygon
+
+/*UPDATE gracethd_metis.t_zsro a
+SET geom = null;
+UPDATE gracethd_metis.t_zsro a
+SET geom = b.geom
+FROM gracethd_metis.zsro b 
+WHERE a.zs_code= b.zs_code*/

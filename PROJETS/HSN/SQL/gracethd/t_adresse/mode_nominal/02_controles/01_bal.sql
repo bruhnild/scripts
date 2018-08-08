@@ -124,7 +124,7 @@ OR ad_racc IS NULL AND destruction NOT LIKE 'Supprimé' AND ad_nblpro > 0;
 --- Traitement : Vue qui contient toutes les batis "durs" qui n'ont pas de bal
 
 
-CREATE OR REPLACE VIEW rbal.v_ctrl_batimentdur_out_bal AS
+/*CREATE OR REPLACE VIEW rbal.v_ctrl_batimentdur_out_bal AS
 SELECT ROW_NUMBER() OVER(ORDER BY geo_batiment) gid, * 
 FROM(
 SELECT 
@@ -146,7 +146,7 @@ WHERE
   ) AND geo_dur = '01')a
 ;
 
-
+*/
 --- Schema : rbal
 --- Vue : v_ctrl_bal_out_id_ban
 --- Traitement : Vue qui contient toutes bal sans id_ban

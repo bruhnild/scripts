@@ -19,11 +19,11 @@ CREATE ROLE group_items_hsn WITH
 
 
 ---Requête de création des utilisateurs---
-CREATE USER rtlili WITH LOGIN ENCRYPTED PASSWORD '74aXixY5';
+CREATE USER rtlili WITH LOGIN ENCRYPTED PASSWORD 'xxx';
 GRANT rtlili TO group_items_hsn;
-CREATE USER sjrad WITH LOGIN ENCRYPTED PASSWORD 'Qdbk425J';
+CREATE USER sjrad WITH LOGIN ENCRYPTED PASSWORD 'xxx';
 GRANT sjrad TO group_items_hsn;
-CREATE USER feten WITH LOGIN ENCRYPTED PASSWORD 'zaVmR436';
+CREATE USER feten WITH LOGIN ENCRYPTED PASSWORD 'xxx';
 GRANT feten TO group_items_hsn;
 */
 --- Requete de création des droits associés

@@ -24,7 +24,7 @@
     along with GraceTHD.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-SET search_path TO gracethd, public;
+SET search_path TO gracethd_metis, public;
 
 /*###################### PATCHS 2.0.1 ##################################*/
 

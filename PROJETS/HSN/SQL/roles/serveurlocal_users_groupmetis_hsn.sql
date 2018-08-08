@@ -16,13 +16,13 @@ CREATE ROLE group_metis_hsn WITH
   CONNECTION LIMIT -1;
 
 ---Requête de création des utilisateurs---
-CREATE USER msteiner WITH LOGIN ENCRYPTED PASSWORD '4Kf37fTe';
+CREATE USER msteiner WITH LOGIN ENCRYPTED PASSWORD 'xxx';
 GRANT msteiner TO group_metis_hsn;
-CREATE USER bfray WITH LOGIN ENCRYPTED PASSWORD 'BswN92u4';
+CREATE USER bfray WITH LOGIN ENCRYPTED PASSWORD 'xxx';
 GRANT bfray TO group_metis_hsn;
-CREATE USER amohamadi WITH LOGIN ENCRYPTED PASSWORD 'Ruc23kL7';
+CREATE USER amohamadi WITH LOGIN ENCRYPTED PASSWORD 'xxx';
 GRANT amohamadi TO group_metis_hsn;
-CREATE USER acalba WITH LOGIN ENCRYPTED PASSWORD 'Dh8i3n5K';
+CREATE USER acalba WITH LOGIN ENCRYPTED PASSWORD 'xxx';
 GRANT acalba TO group_metis_hsn;
 */
 --- Requete de création des droits associés

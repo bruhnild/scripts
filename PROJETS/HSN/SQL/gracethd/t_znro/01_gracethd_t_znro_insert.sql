@@ -49,4 +49,14 @@ SELECT
 	geom
 
 FROM nro)a
-WHERE geom IS NOT NULL
+WHERE geom IS NOT NULL;
+
+-- En cas de truncate de t_noeud t_znro se truncate aussi
+--Importer znro en multipolygon
+
+/*UPDATE gracethd_metis.t_znro a
+SET geom = null;
+UPDATE gracethd_metis.t_znro a
+SET geom = b.geom
+FROM gracethd_metis.znro b 
+WHERE a.zn_code= b.zn_code;*/

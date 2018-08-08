@@ -13,7 +13,6 @@ Modification : Nom : ///// - Date : date_de_modif - Motif/nature : //////
 --- Vue : vm_bal_columns_gracethdview
 --- Traitement : Crée la vue vm_bal_columns_gracethdview à partir de jointures (cf I:\20-MOE70-HSN\07-Scripts\SQL\gracethd\t_adresse\mode_nominal\vues)
 
-
 DROP MATERIALIZED VIEW IF EXISTS rbal.vm_bal_columns_gracethdview CASCADE;
 CREATE MATERIALIZED VIEW rbal.vm_bal_columns_gracethdview AS
 
@@ -33,6 +32,7 @@ WITH columns_gracethdview AS
   (CASE WHEN ((CASE WHEN ad_nblhab IS NOT NULL THEN ad_nblhab ELSE 0 END)+ad_nblpro)>=3 THEN 'I' ELSE 'P' END)::varchar as ad_itypeim,
   (CASE WHEN a.construction ='En construction' THEN TRUE ELSE NULL END)::boolean as ad_imneuf,
   insee,
+  code_postal,
   nom,
   nom_sro,
   st_x(a.geom) as x,
@@ -57,7 +57,7 @@ SELECT
   columns_gracethdview.ad_creadat, 
   columns_gracethdview.insee as ad_insee,
   columns_gracethdview.nom as ad_commune, 
-  b.code_postal as ad_postal, 
+  columns_gracethdview.code_postal as ad_postal, 
   columns_gracethdview.ad_nblhab,
   columns_gracethdview.ad_nblpro,
   columns_gracethdview.ad_nbprhab, 
@@ -83,7 +83,6 @@ SELECT
   p.ad_y_ban,
   columns_gracethdview.geom
 FROM columns_gracethdview
-LEFT JOIN la_poste.codcom_codpost_correspondance_hsn_2017 b ON columns_gracethdview.insee=b.code_commune_insee
 LEFT JOIN  rbal.v_bal_ad_nbprpro c ON columns_gracethdview.ad_code = c.ad_code
 LEFT JOIN  rbal.v_bal_ad_isole d ON columns_gracethdview.ad_code = d.ad_code
 LEFT JOIN  rbal.v_bal_nb_prises_totale e ON columns_gracethdview.ad_code = e.ad_code
@@ -106,14 +105,14 @@ LEFT JOIN  rbal.v_bal_nom_sro t ON columns_gracethdview.ad_code = t.ad_code)a;
 
 CREATE INDEX vm_bal_columns_gracethdview_gix ON rbal.vm_bal_columns_gracethdview USING GIST (geom);
 
-
+REFRESH MATERIALIZED VIEW rbal.vm_bal_columns_gracethdview;
 
 --- Schema : rbal
 --- Vue : vm_bal_columns_gracethdview
 --- Traitement : le trigger qui va raffraichir la vue vm_bal_columns_gracethdview à chaque nouvelle entité de bal
 
 
-CREATE OR REPLACE FUNCTION fn_refresh_vm_bal_columns_gracethdview() 
+/*CREATE OR REPLACE FUNCTION fn_refresh_vm_bal_columns_gracethdview() 
 RETURNS TRIGGER AS $$
 BEGIN
   REFRESH MATERIALIZED VIEW rbal.vm_bal_columns_gracethdview;
@@ -126,4 +125,4 @@ CREATE TRIGGER trg_refresh_vm_bal_columns_gracethdview
 AFTER INSERT OR UPDATE OF geom
 ON rbal.bal_hsn_point_2154
 FOR EACH ROW 
-EXECUTE PROCEDURE fn_refresh_vm_bal_columns_gracethdview();
+EXECUTE PROCEDURE fn_refresh_vm_bal_columns_gracethdview();*/
