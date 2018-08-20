@@ -12,8 +12,8 @@ Modification : Nom : ///// - Date : date_de_modif - Motif/nature : //////
 --- Table : t_adresse
 --- Traitement : Rempli la table t_adresse avec les nouvelles valeurs de v_adresse
 
---TRUNCATE gracethd_metis.t_adresse CASCADE;
---TRUNCATE rbal.t_adresse CASCADE;
+TRUNCATE gracethd_metis.t_adresse CASCADE;
+TRUNCATE rbal.t_adresse CASCADE;
 
 INSERT INTO rbal.t_adresse ( 
 	ad_code, 

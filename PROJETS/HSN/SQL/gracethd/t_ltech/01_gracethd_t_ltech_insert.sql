@@ -1,7 +1,6 @@
 --- Schema : gracethd_metis
 --- Table : t_ltech
 --- Traitement : Initialise la table t_ltech à partir de ??
-
 TRUNCATE gracethd_metis.t_ltech CASCADE;
 
 INSERT INTO gracethd_metis.t_ltech ( 
@@ -15,9 +14,9 @@ INSERT INTO gracethd_metis.t_ltech (
 	, lt_etat
 	, lt_creadat
 )
+
 SELECT
 	lt_code
-	-- , AS lt_etiquet -- VARCHAR(20)   
 	, lt_st_code
 	, 'OR700000000000' AS lt_prop
 	, 'OR700000000000' AS lt_gest
@@ -44,9 +43,10 @@ FROM
 UNION ALL 
 
 	SELECT 
-	concat('BP700', digt_6, digt_7, digt_8, digt_9, to_char(g.id, 'FM00000')) bp_code
+	concat('LT700', concat(b.digt_6, b.digt_7, '00'), to_char(ROW_NUMBER() OVER (PARTITION BY concat(b.digt_6, b.digt_7, '00') ) + 13, 'FM00000')) as lt_code	
+	, concat('ST700', concat(b.digt_6, b.digt_7, '00'), to_char(ROW_NUMBER() OVER (PARTITION BY concat(b.digt_6, b.digt_7, '00') ) + 13, 'FM00000')) as lt_st_code														  
 	FROM
-	avp_n070gay.boite g
-	, psd_orange.zasro_hsn_polygon_2154 s
-	WHERE ST_CONTAINS(s.geom, g.geom)
+	avp_n070gay.boite a
+	, psd_orange.zasro_hsn_polygon_2154 b
+	WHERE ST_CONTAINS(b.geom, a.geom)
 ) a

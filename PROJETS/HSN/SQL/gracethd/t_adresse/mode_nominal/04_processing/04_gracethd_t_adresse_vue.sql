@@ -33,23 +33,23 @@ Soit le code ‘AD700BI000001’ pour le premier objet de la t_adresse (en suppo
 */
 ------==========================================================================------
 	
-DROP SEQUENCE IF EXISTS rbal.bal_incrementation_ad_seq;
-CREATE SEQUENCE rbal.bal_incrementation_ad_seq
-  INCREMENT 1
-  MINVALUE 000000000
-  MAXVALUE 999999999
-  START 1
-  CACHE 1;
-ALTER TABLE rbal.bal_hsn_point_2154 OWNER TO postgres;
+-- DROP SEQUENCE IF EXISTS rbal.bal_incrementation_ad_seq;
+-- CREATE SEQUENCE rbal.bal_incrementation_ad_seq
+--   INCREMENT 1
+--   MINVALUE 000000000
+--   MAXVALUE 999999999
+--   START 1
+--   CACHE 1;
+-- ALTER TABLE rbal.bal_hsn_point_2154 OWNER TO postgres;
 
-CREATE OR REPLACE FUNCTION
-nextval_special()
-RETURNS TEXT
-LANGUAGE sql
-AS
-$$
-    SELECT to_char(nextval('rbal.bal_incrementation_ad_seq'), 'FM00000'); 
-$$;
+-- CREATE OR REPLACE FUNCTION
+-- nextval_special()
+-- RETURNS TEXT
+-- LANGUAGE sql
+-- AS
+-- $$
+--     SELECT to_char(nextval('rbal.bal_incrementation_ad_seq'), 'FM00000'); 
+-- $$;
 
 ------==========================================================================------
 ------= ETAPE 2 : CREATION DE LA VUE v_adresse AU FORMAT GRACETHD=------

@@ -8,7 +8,7 @@ INSERT INTO gracethd_metis.t_conduite (
 	cd_code 
 	, cd_cd_code 
 	, cd_prop
-	, cd_gest 
+	, cd_gest
 	, cd_user 
 	, cd_statut
 	, cd_avct
@@ -18,8 +18,8 @@ INSERT INTO gracethd_metis.t_conduite (
 )
 
 SELECT
-	concat('CD700', digt_6, digt_7, digt_8, digt_9, to_char(a.id, 'FM00000')) AS cd_code
-	, concat('CD700', digt_6, digt_7, digt_8, digt_9, to_char(a.id, 'FM00000')) AS cd_cd_code -- REFERENCES t_conduite (cd_code)
+	concat('CD700', digt_6, digt_7, '00', to_char(a.id, 'FM00000')) AS cd_code
+	, concat('CD700', digt_6, digt_7, '00', to_char(a.id, 'FM00000')) AS cd_cd_code -- REFERENCES t_conduite (cd_code)
 	, 'OR700000000002' cd_prop -- REFERENCES t_organisme (or_code)
 	, 'OR700000000002' cd_gest --  REFERENCES t_organisme (or_code),
 	, 'OR700000000002' cd_user --  REFERENCES t_organisme (or_code),
@@ -30,4 +30,6 @@ SELECT
 	, now() AS cd_creadat 
 FROM orange.ft_arciti_hsn_linestring_2154 a
 	, psd_orange.zanro_hsn_polygon_2154 b
-WHERE st_intersects(a.geom, b.geom);
+WHERE st_intersects(a.geom, b.geom)
+AND b.code_nro_def LIKE '%N070GAY%' -- /!\ ADAPTER EN FONCTION DU NRO EN COURS
+;
