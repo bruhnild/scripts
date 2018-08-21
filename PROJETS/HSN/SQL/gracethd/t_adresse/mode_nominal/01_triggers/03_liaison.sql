@@ -70,3 +70,29 @@ AFTER INSERT OR UPDATE OF geom
 ON rbal.liaison_hsn_linestring_2154
 FOR EACH ROW 
 EXECUTE PROCEDURE fn_update_liaison_ad_code();
+
+
+--- Schema : rbal
+--- Table : liaison_hsn_linestring_2154
+--- Traitement : Mise à jour du champ ad_nomvoie à chaque nouvelle liaison
+
+
+CREATE OR REPLACE FUNCTION fn_update_liaison_ad_nomvoie()
+RETURNS trigger AS
+$func$
+BEGIN
+UPDATE rbal.liaison_hsn_linestring_2154 a
+SET    ad_nomvoie=b.nom_voie
+FROM    ban.hsn_point_2154 b
+WHERE ST_DWithin(a.geom, b.geom, 0.001) ;
+RETURN NULL;
+END
+$func$  LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_update_liaison_ad_nomvoie ON rbal.liaison_hsn_linestring_2154;
+DROP TRIGGER IF EXISTS trg_update_liaison_ad_nomvoie ON ban.hsn_point_2154;
+CREATE TRIGGER trg_update_liaison_ad_nomvoie
+AFTER INSERT OR UPDATE OF geom
+ON rbal.liaison_hsn_linestring_2154
+FOR EACH ROW 
+EXECUTE PROCEDURE fn_update_liaison_ad_nomvoie();

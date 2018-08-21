@@ -20,6 +20,7 @@ TOUT CE QUI EST SANS NUMERO
 */
 
 (
+
 SELECT 
   hp.ad_code,
   hp.ad_numero
@@ -27,6 +28,77 @@ FROM
   rbal.bal_hsn_point_2154 as hp
 WHERE
   hp.ad_code NOT IN 
+
+((
+SELECT ad_code FROM 
+(WITH bal_ad_numero AS
+((SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
+FROM
+
+(
+SELECT 
+  hp.ad_code,
+  hp.ad_numero
+FROM
+  rbal.bal_hsn_point_2154 as hp
+WHERE
+  hp.ad_code NOT IN 
+
+(SELECT DISTINCT ON (ad_code) ad_code
+FROM
+(
+WITH ad_numero_ban AS
+(SELECT 
+  DISTINCT ON (ad_code) a.ad_code,
+  ad_ban_id, 
+  cast(numero as integer)
+FROM rbal.bal_hsn_point_2154 a, ban.hsn_point_2154 b
+WHERE a.ad_ban_id=b.id)
+SELECT ad_code, ad_ban_id, numero FROM ad_numero_ban
+WHERE ad_ban_id IS NOT NULL)a) 
+AND ad_numero IS NOT NULL
+
+
+UNION ALL
+
+
+(SELECT DISTINCT ON (ad_code) ad_code, numero
+FROM
+(
+WITH ad_numero_ban AS
+(SELECT 
+  DISTINCT ON (ad_code) a.ad_code,
+  ad_ban_id, 
+  cast(numero as integer)
+FROM rbal.bal_hsn_point_2154 a, ban.hsn_point_2154 b
+WHERE a.ad_ban_id=b.id)
+SELECT ad_code, ad_ban_id, numero FROM ad_numero_ban
+WHERE ad_ban_id IS NOT NULL)a)) a
+WHERE ad_numero IS NOT NULL ))
+SELECT * FROM bal_ad_numero)a)
+
+
+UNION ALL
+
+
+(SELECT ad_code
+FROM 
+
+(WITH numero_majic AS 
+
+(SELECT 
+adresse.ad_code
+, substring(pci.adresse,'([0-9]{1,4})') as numero
+FROM rbal.bal_hsn_point_2154 adresse
+LEFT JOIN pci70_edigeo_majic.parcelle_info AS pci ON st_within(adresse.geom,pci.geom)
+WHERE (adresse.ad_numero IS NULL
+OR adresse.nom_voie_relevee IS NULL)
+AND pci.adresse IS NOT NULL
+AND adresse.ad_ban_id IS NULL
+)
+SELECT ad_code, numero FROM  numero_majic
+WHERE numero IS NOT NULL AND ad_code NOT IN
+
 
 (SELECT ad_code FROM 
 (WITH bal_ad_numero AS
@@ -47,31 +119,35 @@ FROM
 (
 WITH ad_numero_ban AS
 (SELECT 
-	DISTINCT ON (ad_code) a.ad_code,
-	ad_ban_id, 
- 	cast(numero as integer)
+  DISTINCT ON (ad_code) a.ad_code,
+  ad_ban_id, 
+  cast(numero as integer)
 FROM rbal.bal_hsn_point_2154 a, ban.hsn_point_2154 b
 WHERE a.ad_ban_id=b.id)
 SELECT ad_code, ad_ban_id, numero FROM ad_numero_ban
 WHERE ad_ban_id IS NOT NULL)a) 
 AND ad_numero IS NOT NULL
 
+
 UNION ALL
+
 
 (SELECT DISTINCT ON (ad_code) ad_code, numero
 FROM
 (
 WITH ad_numero_ban AS
 (SELECT 
-	DISTINCT ON (ad_code) a.ad_code,
-	ad_ban_id, 
- 	cast(numero as integer)
+  DISTINCT ON (ad_code) a.ad_code,
+  ad_ban_id, 
+  cast(numero as integer)
 FROM rbal.bal_hsn_point_2154 a, ban.hsn_point_2154 b
 WHERE a.ad_ban_id=b.id)
 SELECT ad_code, ad_ban_id, numero FROM ad_numero_ban
 WHERE ad_ban_id IS NOT NULL)a)) a
 WHERE ad_numero IS NOT NULL ))
 SELECT * FROM bal_ad_numero)a)
+
+)a))
 
 
 
@@ -86,7 +162,7 @@ UNION ALL
 -------------------------------------------------------------------------------------
 
 
-
+(
 SELECT ad_code, ad_numero FROM 
 (WITH bal_ad_numero AS
 ((SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
@@ -132,4 +208,79 @@ WHERE a.ad_ban_id=b.id)
 SELECT ad_code, ad_ban_id, numero FROM ad_numero_ban
 WHERE ad_ban_id IS NOT NULL)a)) a
 WHERE ad_numero IS NOT NULL ))
-SELECT * FROM bal_ad_numero)a)a
+SELECT * FROM bal_ad_numero)a)
+
+-----------------NUMERO AVEC MAJIC
+UNION ALL
+-----------------NUMERO AVEC MAJIC
+
+(SELECT ad_code, numero :: int
+FROM 
+
+(WITH numero_majic AS 
+
+(SELECT 
+adresse.ad_code
+, substring(pci.adresse,'([0-9]{1,4})') as numero
+FROM rbal.bal_hsn_point_2154 adresse
+LEFT JOIN pci70_edigeo_majic.parcelle_info AS pci ON st_within(adresse.geom,pci.geom)
+WHERE (adresse.ad_numero IS NULL
+OR adresse.nom_voie_relevee IS NULL)
+AND pci.adresse IS NOT NULL
+AND adresse.ad_ban_id IS NULL
+)
+SELECT ad_code, numero FROM  numero_majic
+WHERE numero IS NOT NULL AND ad_code NOT IN
+
+
+(SELECT ad_code FROM 
+(WITH bal_ad_numero AS
+((SELECT ROW_NUMBER() OVER(ORDER BY ad_code) gid, *
+FROM
+
+(
+SELECT 
+  hp.ad_code,
+  hp.ad_numero
+FROM
+  rbal.bal_hsn_point_2154 as hp
+WHERE
+  hp.ad_code NOT IN 
+
+(SELECT DISTINCT ON (ad_code) ad_code
+FROM
+(
+WITH ad_numero_ban AS
+(SELECT 
+  DISTINCT ON (ad_code) a.ad_code,
+  ad_ban_id, 
+  cast(numero as integer)
+FROM rbal.bal_hsn_point_2154 a, ban.hsn_point_2154 b
+WHERE a.ad_ban_id=b.id)
+SELECT ad_code, ad_ban_id, numero FROM ad_numero_ban
+WHERE ad_ban_id IS NOT NULL)a) 
+AND ad_numero IS NOT NULL
+
+
+UNION ALL
+
+
+(SELECT DISTINCT ON (ad_code) ad_code, numero
+FROM
+(
+WITH ad_numero_ban AS
+(SELECT 
+  DISTINCT ON (ad_code) a.ad_code,
+  ad_ban_id, 
+  cast(numero as integer)
+FROM rbal.bal_hsn_point_2154 a, ban.hsn_point_2154 b
+WHERE a.ad_ban_id=b.id)
+SELECT ad_code, ad_ban_id, numero FROM ad_numero_ban
+WHERE ad_ban_id IS NOT NULL)a)) a
+WHERE ad_numero IS NOT NULL ))
+SELECT * FROM bal_ad_numero)a)
+
+)a)
+
+)
+a
