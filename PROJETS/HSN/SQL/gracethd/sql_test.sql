@@ -1,1 +1,0 @@
-select * from 'avp_'||'n070gay'.boite; 

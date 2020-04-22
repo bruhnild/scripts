@@ -1,1 +1,0 @@
-SELECT 'drop table if exists rbal.t_adresse_' || nom_sro || '; create table gracethd_metis_livrables.t_adresse_'|| nom_sro || ' as select * from rbal.t_adresse where nom_sro =' || quote_literal(nom_sro) || ';' AS requete FROM (SELECT DISTINCT nom_sro FROM rbal.t_adresse) AS a \gexec

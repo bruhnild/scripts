@@ -1,0 +1,22 @@
+# Générer une nouvelle clé ssh
+
+`ssh-keygen -t rsa -b 4096 -C "marinefaucher@icloud.com"`
+> Generating public/private rsa key pair.
+> Enter a file in which to save the key (/home/you/.ssh/id_rsa): [Press enter]
+> Enter passphrase (empty for no passphrase): [Press enter]
+> Enter same passphrase again: [Press enter]
+
+Copier le contenu de la clé /home/mfu/.ssh/id_rsa.pub
+Coller dans github>Setting>SSH and GPG keys
+
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDgP1yhmyg4dcJWwMBrEmMPCWvicg3jlYNNg+eLD4VEC/EJF7k2A0TXb1dTPc+k2IZ1LfRzQmCiA8XWf9FJaiCA9AOzmNU7O0mGGwK6cYkYR2DiDN0Bm4eZtteYk7iiAl/NJOvmt4tEZBmxB7zOJG/RmOdWclbsYAWPihyeVgOfc6bUfceZW8kaXTjlJLhZ/udc8DRNPl//8LBnS/HiJnWuhZuRuQNFnwCIjpjoBulwh2wqRtlWat8hUin4cs2LgzT/zjM76A9EYURbd9iwrrWuYeY+CACPbkGfFYzRFBQ6qV5+YB+JM/WQgEwZ2NZjRF/7g3oYAkTfAOhtUDu/V9nX marinefaucher@icloud.com
+
+# Si git clone avec ssh ne fonctionne pas
+
+$ git clone git@github.com:debuggable/secret-project.debuggable.com.git
+Initialized empty Git repository in /var/git/secret-project.debuggable.com/.git/
+The authenticity of host 'github.com (65.74.177.129)' can't be established.
+RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
+Are you sure you want to continue connecting (yes/no)?
+
+echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config

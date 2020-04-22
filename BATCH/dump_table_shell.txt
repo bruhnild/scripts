@@ -1,8 +1,0 @@
-sudo pg_dump -h [hosts] -p [port] -U [user] -v -f [/file/location/name.sql] -t [schema].[table] [database]
-pré-requis : 
-
-#su - root
-#visudo
---> Ajouter l'utilisateur postgres dans le fichier sudoers --> postgres ALL=NOPASSWD ALL
-#su - postgres
-#sudo pg_dump -h [hosts] -p [port] -U [user] -v -f [/file/location/name.sql] -t [schema].[table] [database]

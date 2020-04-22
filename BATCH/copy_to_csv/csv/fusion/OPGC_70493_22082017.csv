@@ -1,7 +1,0 @@
-"num_appui";"code_commune";"libelle_commune";"code_voie";"libelle_voie";"code_centre";"code_zone";"code_entite";"num_voie";"type_appui";"caract1";"caract2";"caract3";"caract4";"caract5";"type_projection";"coord_x";"coord_y"
-"0734641";"70493";"SORANS-LES-BREUREY";"010T";"RUE BRUYERES";"BLT";"H00";"X0";;"BC8";"ANC";"PRT";"TRM";"TRN";"TDL";"Lambert II Etendu";"879726.2000161747";"2271709.4099811856"
-"0734647";"70493";"SORANS-LES-BREUREY";"010T";"RUE BRUYERES";"BLT";"H00";"X0";;"BC8";"ANC";"TRM";"TRN";;;"Lambert II Etendu";"879779.0099923016";"2271519.1999903503"
-"0721471";"70493";"SORANS-LES-BREUREY";"008T";"RTE THEY";"RIO";"ZD0";"X0";;"BM7";"SPC";"TCR";"TRM";"TDL";;"Lambert II Etendu";"881621.0000130839";"2271521.000022683"
-"0734640";"70493";"SORANS-LES-BREUREY";"009T";"CHE ROSES";"BLT";"H00";"X0";"4";"BS7";"TRN";;;;;"Lambert II Etendu";"879613.0400208833";"2271819.4199743117"
-"0734682";"70493";"SORANS-LES-BREUREY";"008T";"RTE THEY";"BLT";"H00";"X0";"4";"BS8";;;;;;"Lambert II Etendu";"879877.989974893";"2271354.7000131686"
-"0721585";"70493";"SORANS-LES-BREUREY";"010T";"RUE BRUYERES";"BLT";"H00";"X0";;"BS8";"PRT";"RPC";"TRM";"TDL";;"Lambert II Etendu";"879784.9999728068";"2271478.0000043516"
