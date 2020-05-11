@@ -1,1 +1,8 @@
 https://www.digitalocean.com/community/tutorials/how-to-install-anaconda-on-ubuntu-18-04-quickstart-fr
+
+--Créer environnement conda
+$ conda create -n gis python=3 anaconda
+
+-- créer le kernel dans cet environnement
+$ python -m ipykernel install --user --name=g
+is

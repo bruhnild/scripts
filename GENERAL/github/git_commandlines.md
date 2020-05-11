@@ -26,3 +26,21 @@ $ git checkout manouvellebranche
 $ git rebase master
 $ git push --force origin manouvellebranche
 ```
+## Récupérer les modifications sur une branche
+
+```sh
+$ git pull --rebase
+```
+## Remplacer la branche master par une autre branche
+
+```sh
+$ git checkout mabranche
+$ git merge -s ours master
+$ git checkout master
+$ git merge mabranche  
+```
+
+## Supprimer branche distante
+```sh
+$ git push -d origin manouvellebranche
+```
